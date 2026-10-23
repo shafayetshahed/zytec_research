@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /admin
+Disallow: /student
+Disallow: /verify-email
+Disallow: /reset-password
+Disallow: /forgot-password
+
+Sitemap: https://research.zytecs.com/sitemap.xml

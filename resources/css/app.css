@@ -1,0 +1,278 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views';
+@source '../js';
+
+/*
+ * Zytecs Research design tokens.
+ * Navy, royal blue and sky are sampled from the supplied logo; warm ivory
+ * paper and a restrained bronze give the editorial, library-like register.
+ */
+@theme {
+    --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-serif: 'Newsreader', ui-serif, Georgia, serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    --color-ink: #0a1f3c;
+    --color-ink-soft: #24385a;
+    --color-royal: #0a4da6;
+    --color-royal-dark: #083d84;
+    --color-sky: #1592e6;
+    --color-cyan: #19c3f5;
+    --color-slate: #56677a;
+    --color-muted: #4e5965;
+    --color-paper: #f7f4ed;
+    --color-paper-deep: #efe9dd;
+    --color-card: #fffdf8;
+    --color-line: #ddd5c6;
+    --color-line-soft: #e9e3d6;
+    --color-bronze: #8a5d28;
+    --color-success: #1e6b45;
+    --color-success-bg: #e3f1e8;
+    --color-warning: #8a5300;
+    --color-warning-bg: #fbf0d9;
+    --color-danger: #a12a1f;
+    --color-danger-bg: #f9e4e1;
+
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 10px;
+
+    --shadow-soft: 0 1px 2px rgb(10 31 60 / 0.06), 0 8px 24px -12px rgb(10 31 60 / 0.18);
+
+    --breakpoint-xs: 26rem;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        @apply bg-paper font-sans text-[1.0625rem] leading-relaxed text-ink antialiased;
+    }
+
+    h1, h2, h3, h4 {
+        @apply font-serif font-medium tracking-tight text-ink;
+        text-wrap: balance;
+    }
+
+    p {
+        text-wrap: pretty;
+    }
+
+    /* Links are underlined so they never rely on colour alone (WCAG 1.4.1); buttons and navigation opt out. */
+    a {
+        @apply text-royal underline decoration-1 underline-offset-4;
+    }
+
+    :focus-visible {
+        outline: 3px solid var(--color-sky);
+        outline-offset: 2px;
+        border-radius: 2px;
+    }
+
+    ::selection {
+        background: rgb(21 146 230 / 0.2);
+    }
+
+    code, kbd {
+        @apply font-mono text-[0.9em];
+    }
+
+    [x-cloak], [hidden] {
+        display: none !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after {
+            animation-duration: 0.01ms !important;
+            transition-duration: 0.01ms !important;
+            scroll-behavior: auto !important;
+        }
+    }
+}
+
+@layer components {
+    .container-page {
+        @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
+    }
+
+    .eyebrow {
+        @apply inline-flex items-center gap-3 font-sans text-xs font-semibold tracking-[0.18em] text-bronze uppercase;
+    }
+
+    .eyebrow::before {
+        content: '';
+        @apply h-px w-8 bg-bronze/60;
+    }
+
+    .display {
+        @apply font-serif text-4xl leading-[1.08] font-medium sm:text-5xl lg:text-[3.6rem];
+    }
+
+    .section-title {
+        @apply font-serif text-3xl leading-tight sm:text-[2.35rem];
+    }
+
+    .lede {
+        @apply text-lg leading-relaxed text-ink-soft sm:text-xl;
+    }
+
+    .rule {
+        @apply border-t border-line;
+    }
+
+    .btn {
+        @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-md px-5 py-2.5 text-[0.95rem] font-semibold no-underline transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-60;
+    }
+
+    .btn-primary {
+        @apply bg-royal text-white hover:bg-royal-dark;
+    }
+
+    .btn-ink {
+        @apply bg-ink text-white hover:bg-ink-soft;
+    }
+
+    .btn-outline {
+        @apply border border-ink/25 bg-transparent text-ink hover:border-ink hover:bg-ink/[0.03];
+    }
+
+    .btn-whatsapp {
+        @apply bg-[#1d6f42] text-white hover:bg-[#165834];
+    }
+
+    .btn-danger {
+        @apply bg-danger text-white hover:bg-[#87231a];
+    }
+
+    .btn-sm {
+        @apply min-h-9 px-3.5 py-1.5 text-sm;
+    }
+
+    .link-arrow {
+        @apply inline-flex items-center gap-1.5 font-semibold text-royal no-underline hover:underline;
+    }
+
+    .field {
+        @apply flex flex-col gap-1.5;
+    }
+
+    .label {
+        @apply text-sm font-semibold text-ink;
+    }
+
+    .label-optional {
+        @apply ml-1 text-xs font-normal text-muted;
+    }
+
+    .hint {
+        @apply text-sm text-muted;
+    }
+
+    .input {
+        @apply block min-h-11 w-full rounded-md border border-line bg-card px-3.5 py-2.5 text-base text-ink shadow-[inset_0_1px_1px_rgb(10_31_60/0.04)] transition-colors placeholder:text-muted/70 hover:border-slate/60 focus:border-royal focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky aria-[invalid=true]:border-danger;
+    }
+
+    .checkbox {
+        @apply mt-1 size-5 shrink-0 rounded-sm border-line accent-royal;
+    }
+
+    .field-error {
+        @apply flex items-start gap-1.5 text-sm font-medium text-danger;
+    }
+
+    .card {
+        @apply rounded-lg border border-line bg-card;
+    }
+
+    .badge {
+        @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap;
+    }
+
+    .code-tag {
+        white-space: nowrap;
+        @apply inline-block rounded-sm border border-line bg-paper px-1.5 py-0.5 font-mono text-[0.8rem] font-medium tracking-tight text-ink;
+    }
+
+    .alert {
+        @apply flex items-start gap-3 rounded-md border px-4 py-3 text-[0.95rem];
+    }
+
+    .alert-success {
+        @apply border-success/30 bg-success-bg text-success;
+    }
+
+    .alert-error {
+        @apply border-danger/30 bg-danger-bg text-danger;
+    }
+
+    .alert-info {
+        @apply border-royal/20 bg-[#e8f0fb] text-royal-dark;
+    }
+
+    .alert-warning {
+        @apply border-warning/30 bg-warning-bg text-warning;
+    }
+
+    .data-table {
+        @apply w-full border-collapse text-left text-sm;
+    }
+
+    .data-table th {
+        @apply border-b border-line px-3 py-2.5 text-xs font-semibold tracking-wide text-muted uppercase;
+    }
+
+    .data-table td {
+        @apply border-b border-line-soft px-3 py-3 align-top;
+    }
+
+    .prose-zr {
+        @apply max-w-[68ch] text-ink-soft;
+    }
+
+    .prose-zr h2 {
+        @apply mt-12 mb-3 text-2xl;
+    }
+
+    .prose-zr h3 {
+        @apply mt-8 mb-2 text-xl;
+    }
+
+    .prose-zr p, .prose-zr ul, .prose-zr ol {
+        @apply mb-4;
+    }
+
+    .prose-zr ul {
+        @apply list-disc pl-6 marker:text-bronze;
+    }
+
+    .prose-zr ol {
+        @apply list-decimal pl-6 marker:text-bronze;
+    }
+
+    .prose-zr li {
+        @apply mb-1.5;
+    }
+
+    .prose-zr a {
+        @apply underline;
+    }
+
+    .photo-frame {
+        @apply relative;
+    }
+
+    .photo-frame::after {
+        content: '';
+        @apply pointer-events-none absolute -right-3 -bottom-3 -z-10 h-full w-full rounded-lg border border-bronze/40;
+    }
+
+    .skip-link {
+        @apply sr-only rounded-md bg-ink px-4 py-2 text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50;
+    }
+}

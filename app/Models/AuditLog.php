@@ -1,0 +1,46 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+
+/**
+ * @property int|null $actor_id
+ * @property string $action
+ * @property array<string, mixed>|null $metadata
+ * @property string|null $ip_address
+ */
+class AuditLog extends Model
+{
+    public const UPDATED_AT = null;
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'metadata' => 'array',
+        ];
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function actor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'actor_id');
+    }
+
+    /**
+     * @return MorphTo<Model, $this>
+     */
+    public function subject(): MorphTo
+    {
+        return $this->morphTo();
+    }
+}

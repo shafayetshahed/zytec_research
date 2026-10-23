@@ -1,0 +1,34 @@
+# Test plan
+
+Layers: **PHPUnit feature/unit tests** (`tests/Feature`, `tests/Unit`; in-memory SQLite by default, also run against MariaDB), **Playwright browser tests** (`tests/Browser`; isolated `database/e2e.sqlite`, synthetic accounts and files only), **axe-core** accessibility scans, **Larastan** (level 6), **Pint**, **Composer/npm audit**, **Lighthouse**. External email is replaced by Laravel's fake transport (feature tests) or the `log` transport (browser tests); time is controlled with `freezeTime()`/`travel()`.
+
+## Traceability
+
+| Requirement (brief §) | Behaviour | Positive tests | Negative / security tests |
+| --- | --- | --- | --- |
+| Registration (§12) | Name, email, WhatsApp, password, terms; pending account; OTP sent | `RegistrationTest::test_valid_registration_creates_unverified_student_and_sends_code` | duplicate email (case-insensitive), invalid WhatsApp ×6, password rules, terms, required fields, role mass-assignment, mail failure, rate limit |
+| OTP security (§13, §36) | 6-digit CSPRNG, hashed, 10-min expiry, single use, max attempts, cooldown, invalidation | `EmailOtpTest::test_correct_code_verifies_email`, `…code_with_spaces…`, `…just_before_expiry…` | incorrect, malformed (not counted), expired, reused, replaced, max attempts lock, hashed storage, not in page/URL, resend cooldown, resend & verify rate limits, unverified blocked, guest blocked; mail content escapes name |
+| Login, logout, reset, sessions (§14, §37) | Email/password login, role redirect, intended URL, logout, reset with expiring token | `LoginTest`, `PasswordResetTest` | wrong password generic message, suspended (login and mid-session), session regeneration, rate limit, GET logout refused, guest pages redirect, no password in audit log, identical reset response for unknown email, invalid/expired token, reset rate limit, spoofed Host header, remember-token rotation (`SecurityRegressionTest`) |
+| Student dashboard & profile (§15) | Own submissions, empty state, verified status, WhatsApp, profile/password/deletion request | `SubmissionTest::test_dashboard_*`, `ProfileTest` | other students' data hidden, email/role cannot be changed, current password required, XSS escaped |
+| Submission form (§16, §18, §38) | Required fields, optional fields, private storage, reference, timestamp, status New, confirmation page, WhatsApp sync | `SubmissionTest::test_valid_submission_is_stored_privately_and_confirmed`, `…supplementary…`, `…updated_whatsapp…`, `AcceptedFileTypesTest` (8 formats) | required fields, 9 unsafe/mismatched files (PHP, disguised PHP/HTML, zip-as-docx, exe, SVG, empty, PDF-as-PNG, double extension), JPEG-as-PNG, OLE-as-DOCX, macro-enabled DOCX, oversize, too many files, path traversal, markup in module code, past deadline, invalid options, duplicate token, unique references, DB failure rollback + file cleanup, storage failure cleanup, rate limit |
+| Downloads (§17, §39) | Owner and admin download with safe headers | `FileAccessTest::test_owner_can_download…`, `SubmissionManagementTest::test_admin_can_download_any_brief` | guest, other student (404), cross-submission file ID, guessed reference, storage not public, admin blocked from student routes, file/submission mismatch for admin |
+| Notifications (§19, §40) | Email to research@zytecs.com after save, content, secure link, attachment limit, log, retry | `SubmissionTest::test_submission_notifies_business_after_saving`, `…queued_after_commit`, `NotificationContentTest` | email failure keeps submission and stores sanitised error, attachment only under limit, escaping, Markdown link injection, retry success/failure, dashboard failed count |
+| Admin dashboard (§20, §41) | Real metrics | `SubmissionManagementTest::test_dashboard_shows_real_counts` | — |
+| Submission management (§21) | Search, filters, pagination, detail, status with history, notes, close | `SubmissionManagementTest` | invalid status, wildcard search literal, notes hidden from students, escaping |
+| Student management (§22) | Search/filter, profile, suspend/reactivate, delete | `StudentManagementTest` | no secrets shown, admin accounts not manageable as students, typed confirmation (exact), files removed |
+| Admin security (§23) | RBAC on every route | `AccessControlTest` (18 endpoints × guest/student/admin) | no admin registration, suspended admin, noindex on private pages |
+| Database (§24, §42) | Migrations, FKs, uniqueness, cascades, retention | Whole suite on SQLite **and MariaDB**; `CommandsTest::test_prune…`, `EnquiryManagementTest::test_old_enquiries_and_otps_are_pruned` | unique reference/token, rollback test |
+| Public site & SEO (§9, §26, §35) | 12 pages + 17 service pages, metadata, schema, sitemap, robots, redirects, 404 | `PublicPagesTest`, `ContactFormTest` | unique titles/descriptions, one H1, valid JSON-LD without reviews/ratings, no private spreadsheet terms, no unrecorded countries, no spreadsheets in `public/`, no fabricated claims, all internal links resolve, all images exist, honeypot, contact rate limit |
+| Security headers (§44) | CSP, framing, nosniff, HSTS, no inline scripts | `SecurityHeadersTest` | — |
+| Admin provisioning (§20) | CLI admin creation | `CommandsTest` | duplicate email, weak password, demo seeder refuses production |
+| Browser journeys (§43) | Full student and admin journeys | `journeys.spec.js` (3 tests) | student cannot see notes or open admin pages |
+| Accessibility (§28, §45) | WCAG 2.2 AA automated checks + keyboard | `accessibility.spec.js` (17 public pages, OTP, dashboard, form + error state, profile, 5 admin pages; skip link; mobile menu keyboard) | — |
+| Responsive (§28, §43) | Desktop/tablet/mobile, overflow, broken images, screenshots | `responsive.spec.js` (8 pages × 3 sizes), `snapAllSizes` in journeys | — |
+
+## Not automated (manual or environment-dependent)
+
+- Real SMTP delivery and inbox placement (needs credentials) — procedure in `EMAIL-CONFIGURATION.md`.
+- Malware scanning (not implemented).
+- Screen-reader testing with NVDA/VoiceOver, and manual contrast review of photographs with overlaid text.
+- Production HTTPS, cron/queue, backups and restore.
+- Concurrency under real parallel load (duplicate-request protection is covered by the unique client token).
