@@ -46,6 +46,20 @@
 
             @include('admin.submissions.partials.billing')
 
+            @include('admin.submissions.partials.work')
+
+            <x-chat-thread id="chat-student" :messages="$studentThread" :viewer="auth()->user()" perspective="admin"
+                :action="route('admin.submissions.messages.store', [$submission, 'student'])"
+                :attachment-url="fn ($m) => route('admin.submissions.messages.attachment', [$submission, $m])"
+                title="Chat with the student" intro="The student sees replies from “Zytecs Research”. Team members cannot see this thread." />
+
+            @if ($submission->expert_id)
+                <x-chat-thread id="chat-team" :messages="$teamThread" :viewer="auth()->user()" perspective="admin"
+                    :action="route('admin.submissions.messages.store', [$submission, 'team'])"
+                    :attachment-url="fn ($m) => route('admin.submissions.messages.attachment', [$submission, $m])"
+                    title="Chat with {{ $submission->expert?->name }} (team)" intro="Pass on the student's feedback here. The student cannot see this thread." placeholder="Message the team member…" />
+            @endif
+
             <section class="card p-6" aria-labelledby="notes-heading">
                 <h2 id="notes-heading" class="font-serif text-xl">Internal notes <span class="ml-2 align-middle text-xs font-sans font-semibold tracking-wide text-muted uppercase">Admin only</span></h2>
                 <form method="POST" action="{{ route('admin.submissions.notes', $submission) }}" class="mt-4 grid gap-3">

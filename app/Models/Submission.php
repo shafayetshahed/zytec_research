@@ -19,6 +19,10 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $reference
  * @property int $user_id
+ * @property int|null $expert_id
+ * @property string|null $expert_instructions
+ * @property Carbon|null $assigned_at
+ * @property-read User|null $expert
  * @property string $client_token
  * @property string $assignment_name
  * @property string|null $module_code
@@ -62,6 +66,7 @@ class Submission extends Model
             'deadline' => 'date',
             'submitted_at' => 'datetime',
             'closed_at' => 'datetime',
+            'assigned_at' => 'datetime',
         ];
     }
 
@@ -76,6 +81,30 @@ class Submission extends Model
     public function student(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function expert(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'expert_id');
+    }
+
+    /**
+     * @return HasMany<Deliverable, $this>
+     */
+    public function deliverables(): HasMany
+    {
+        return $this->hasMany(Deliverable::class)->latest('id');
+    }
+
+    /**
+     * @return HasMany<Message, $this>
+     */
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class)->orderBy('id');
     }
 
     /**

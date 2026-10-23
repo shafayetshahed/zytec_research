@@ -3,9 +3,11 @@
     $links = [
         ['Overview', route('admin.dashboard'), 'admin.dashboard', 'layout-dashboard'],
         ['Submissions', route('admin.submissions.index'), 'admin.submissions.*', 'inbox'],
+        ['Messages', route('admin.messages'), 'admin.messages', 'message-circle'],
         ['Students & clients', route('admin.students.index'), 'admin.students.*|admin.clients.*', 'users'],
         ['Clients & dues', route('admin.dues'), 'admin.dues*', 'circle-alert'],
         ['Accounting', route('admin.accounting'), 'admin.accounting*|admin.orders.*', 'calculator'],
+        ['Team', route('admin.team.index'), 'admin.team.*', 'users'],
         ['Enquiries', route('admin.enquiries.index'), 'admin.enquiries.*', 'message-circle'],
         ['Notifications', route('admin.notifications.index'), 'admin.notifications.*', 'bell'],
         ['Audit log', route('admin.audit'), 'admin.audit', 'history'],

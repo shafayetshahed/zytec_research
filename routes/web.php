@@ -10,6 +10,7 @@ use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Student;
+use App\Http\Controllers\Team;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -90,7 +91,11 @@ Route::prefix('student')->name('student.')->middleware(['private', 'auth', 'acti
     Route::get('/submissions/{reference}/files/{file}', [Student\SubmissionController::class, 'download'])
         ->whereNumber('file')->middleware('throttle:downloads')->name('submissions.files.download');
 
+    Route::post('/submissions/{reference}/messages', [Student\WorkController::class, 'postMessage'])->middleware('throttle:messages')->name('messages.store');
+
     Route::middleware('throttle:downloads')->group(function () {
+        Route::get('/submissions/{reference}/materials/{deliverable}', [Student\WorkController::class, 'downloadMaterial'])->whereNumber('deliverable')->name('materials.download');
+        Route::get('/submissions/{reference}/messages/{message}/attachment', [Student\WorkController::class, 'downloadAttachment'])->whereNumber('message')->name('messages.attachment');
         Route::get('/submissions/{reference}/quotation.pdf', [DocumentController::class, 'quotation'])->name('documents.quotation');
         Route::get('/submissions/{reference}/receipts/{payment}.pdf', [DocumentController::class, 'receipt'])->whereNumber('payment')->name('documents.receipt');
         Route::get('/submissions/{reference}/invoice.pdf', [DocumentController::class, 'invoice'])->name('documents.invoice');
@@ -114,12 +119,26 @@ Route::prefix('admin')->name('admin.')->middleware(['private', 'auth', 'active',
     Route::put('/submissions/{submission}/quotation', [Admin\QuotationController::class, 'save'])->name('submissions.quotation');
     Route::post('/submissions/{submission}/payments', [Admin\PaymentController::class, 'store'])->name('submissions.payments.store');
     Route::delete('/submissions/{submission}/payments/{payment}', [Admin\PaymentController::class, 'destroy'])->name('submissions.payments.destroy');
+    Route::put('/submissions/{submission}/assignment', [Admin\OrderWorkController::class, 'assign'])->name('submissions.assign');
+    Route::post('/submissions/{submission}/materials', [Admin\OrderWorkController::class, 'uploadMaterial'])->name('submissions.materials.store');
+    Route::post('/submissions/{submission}/materials/{deliverable}/approve', [Admin\OrderWorkController::class, 'approveMaterial'])->name('submissions.materials.approve');
+    Route::post('/submissions/{submission}/materials/{deliverable}/return', [Admin\OrderWorkController::class, 'returnMaterial'])->name('submissions.materials.return');
+    Route::get('/submissions/{submission}/materials/{deliverable}', [Admin\OrderWorkController::class, 'downloadMaterial'])->middleware('throttle:downloads')->name('submissions.materials.download');
+    Route::post('/submissions/{submission}/messages/{channel}', [Admin\OrderWorkController::class, 'postMessage'])->whereIn('channel', ['student', 'team'])->middleware('throttle:messages')->name('submissions.messages.store');
+    Route::get('/submissions/{submission}/messages/{message}/attachment', [Admin\OrderWorkController::class, 'downloadAttachment'])->middleware('throttle:downloads')->name('submissions.messages.attachment');
     Route::get('/submissions/{submission}/files/{file}', [Admin\SubmissionController::class, 'download'])->middleware('throttle:downloads')->name('submissions.files.download');
 
     Route::get('/clients/create', [Admin\ClientController::class, 'create'])->name('clients.create');
     Route::post('/clients', [Admin\ClientController::class, 'store'])->name('clients.store');
     Route::get('/students/{student}/edit', [Admin\ClientController::class, 'edit'])->whereNumber('student')->name('clients.edit');
     Route::put('/students/{student}', [Admin\ClientController::class, 'update'])->whereNumber('student')->name('clients.update');
+
+    Route::get('/team', [Admin\TeamController::class, 'index'])->name('team.index');
+    Route::get('/team/create', [Admin\TeamController::class, 'create'])->name('team.create');
+    Route::post('/team', [Admin\TeamController::class, 'store'])->name('team.store');
+    Route::post('/team/{member}/invite', [Admin\TeamController::class, 'resendInvite'])->whereNumber('member')->name('team.invite');
+    Route::post('/team/{member}/suspend', [Admin\TeamController::class, 'suspend'])->whereNumber('member')->name('team.suspend');
+    Route::post('/team/{member}/reactivate', [Admin\TeamController::class, 'reactivate'])->whereNumber('member')->name('team.reactivate');
 
     Route::get('/orders/create', [Admin\ManualOrderController::class, 'create'])->name('orders.create');
     Route::post('/orders', [Admin\ManualOrderController::class, 'store'])->name('orders.store');
@@ -143,6 +162,8 @@ Route::prefix('admin')->name('admin.')->middleware(['private', 'auth', 'active',
         Route::get('/documents/{reference}/invoice.pdf', [DocumentController::class, 'invoice'])->name('documents.invoice');
     });
 
+    Route::get('/messages', [Admin\MessagesController::class, 'index'])->name('messages');
+
     Route::get('/dues', [Admin\DuesController::class, 'index'])->name('dues');
     Route::get('/dues/export', [Admin\DuesController::class, 'export'])->name('dues.export');
 
@@ -151,4 +172,23 @@ Route::prefix('admin')->name('admin.')->middleware(['private', 'auth', 'active',
 
     Route::get('/settings', [Admin\SettingsController::class, 'index'])->name('settings');
     Route::get('/audit-log', [Admin\SettingsController::class, 'audit'])->name('audit');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Team portal (team members invited by an administrator)
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('team')->name('team.')->middleware(['private', 'auth', 'active', 'verified', 'role:expert'])->group(function () {
+    Route::get('/', [Team\PortalController::class, 'dashboard'])->name('dashboard');
+    Route::get('/orders/{reference}', [Team\PortalController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{reference}/materials', [Team\PortalController::class, 'uploadMaterial'])->name('orders.materials.store');
+    Route::post('/orders/{reference}/messages', [Team\PortalController::class, 'postMessage'])->middleware('throttle:messages')->name('orders.messages.store');
+
+    Route::middleware('throttle:downloads')->group(function () {
+        Route::get('/orders/{reference}/files/{file}', [Team\PortalController::class, 'downloadBrief'])->whereNumber('file')->name('orders.files.download');
+        Route::get('/orders/{reference}/materials/{deliverable}', [Team\PortalController::class, 'downloadMaterial'])->whereNumber('deliverable')->name('orders.materials.download');
+        Route::get('/orders/{reference}/messages/{message}/attachment', [Team\PortalController::class, 'downloadAttachment'])->whereNumber('message')->name('orders.messages.attachment');
+    });
 });

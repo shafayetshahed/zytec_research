@@ -10,14 +10,13 @@ use App\Models\Submission;
 use App\Models\SubmissionFile;
 use App\Models\SubmissionStatusChange;
 use App\Models\User;
-use App\Support\SafeFilename;
+use App\Support\PrivateFileStore;
 use App\Support\SubmissionReference;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Throwable;
 
 /**
@@ -98,24 +97,9 @@ class SubmitBrief
 
     private function storeFile(UploadedFile $upload, bool $isBrief): SubmissionFile
     {
-        $extension = strtolower($upload->getClientOriginalExtension());
-        $directory = config('zytecs.uploads.directory').'/'.now()->format('Y/m');
-        $name = Str::uuid()->toString().'.'.$extension;
-
-        $path = Storage::disk(config('zytecs.uploads.disk'))->putFileAs($directory, $upload, $name);
-
-        if ($path === false) {
-            throw new \RuntimeException('The brief could not be stored.');
-        }
-
         $file = new SubmissionFile;
+        $file->forceFill(PrivateFileStore::store($upload, (string) config('zytecs.uploads.directory')));
         $file->is_brief = $isBrief;
-        $file->original_name = SafeFilename::from($upload->getClientOriginalName(), $extension);
-        $file->storage_path = $path;
-        $file->mime_type = (new \finfo(FILEINFO_MIME_TYPE))->file($upload->getRealPath()) ?: 'application/octet-stream';
-        $file->extension = $extension;
-        $file->size = (int) $upload->getSize();
-        $file->sha256 = hash_file('sha256', $upload->getRealPath()) ?: str_repeat('0', 64);
 
         return $file;
     }

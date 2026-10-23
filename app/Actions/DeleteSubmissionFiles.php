@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Models\Submission;
+use App\Support\PrivateFileStore;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
@@ -23,6 +24,14 @@ class DeleteSubmissionFiles
             } catch (Throwable $exception) {
                 Log::warning('Could not delete a stored brief.', ['file' => $file->id, 'exception' => class_basename($exception)]);
             }
+        }
+
+        foreach ($submission->deliverables as $deliverable) {
+            PrivateFileStore::delete($deliverable->storage_path);
+        }
+
+        foreach ($submission->messages as $message) {
+            PrivateFileStore::delete($message->attachment_path);
         }
     }
 }

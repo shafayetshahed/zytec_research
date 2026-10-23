@@ -49,6 +49,13 @@ This document lists the controls in place, the results of the independent review
 - PDF documents are generated with Dompdf with remote resources, PHP and JavaScript disabled and file access limited to `public/images`. Students can download only their own sent quotations, receipts and paid invoices (404 otherwise); downloads are audit-logged.
 - Exchange-rate lookups send only the currency code and date to the rate service, with a 5-second timeout and caching; no personal data leaves the server.
 
+### Team portal, materials and messages
+- Team members have their own role (`expert`) and only reach `/team`. Every order lookup is scoped to orders assigned to them (404 otherwise), and they cannot reach student or admin routes or documents.
+- Team pages never render the student's name, email, WhatsApp number or institution; student pages never show who prepared materials.
+- Materials and message attachments use the same upload validation and private storage as briefs. Students can download only approved, released materials of their own orders; team members only their own uploads.
+- Student and team message threads are separate channels, enforced on every read, post and attachment download. Alert emails contain no message text or files.
+- Deleting a student or pruning an order also deletes its materials and attachments from storage.
+
 ### Logging and audit
 - `audit_logs` records quotations saved and sent, payments recorded and deleted, sign-ins, failed OTP attempts (reason only), verification, profile/password changes, deletion requests, submissions, downloads, status changes, notes, suspensions, deletions and notification retries, with actor, subject, IP and time.
 - Notification logs store a sanitised error class only.

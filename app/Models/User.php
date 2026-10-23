@@ -79,6 +79,33 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === UserRole::Admin;
     }
 
+    public function isExpert(): bool
+    {
+        return $this->role === UserRole::Expert;
+    }
+
+    /**
+     * Where this account lands after signing in.
+     */
+    public function homeUrl(): string
+    {
+        return match ($this->role) {
+            UserRole::Admin => route('admin.dashboard'),
+            UserRole::Expert => route('team.dashboard'),
+            UserRole::Student => route('student.dashboard'),
+        };
+    }
+
+    /**
+     * Orders assigned to this team member.
+     *
+     * @return HasMany<Submission, $this>
+     */
+    public function assignedSubmissions(): HasMany
+    {
+        return $this->hasMany(Submission::class, 'expert_id');
+    }
+
     public function isStudent(): bool
     {
         return $this->role === UserRole::Student;

@@ -107,5 +107,34 @@
         </section>
     </div>
 
+    <section class="card mt-8 p-6" aria-labelledby="materials-heading" id="materials">
+        <h2 id="materials-heading" class="font-serif text-xl">Feedback &amp; materials</h2>
+        <p class="mt-1 text-sm text-muted">Guidance, suggestions and feedback from our team to help you understand the task and improve your own work. Please do not submit these materials as your own work.</p>
+        @if ($materials->isNotEmpty())
+            <ul class="mt-4 divide-y divide-line-soft rounded-md border border-line">
+                @foreach ($materials as $deliverable)
+                    <li class="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+                        <div class="min-w-0">
+                            <p class="font-medium break-all">{{ $deliverable->original_name }}</p>
+                            <p class="text-xs text-muted">{{ strtoupper($deliverable->extension) }} · {{ $deliverable->humanSize() }} · shared {{ $deliverable->released_at?->format('j M Y') }}</p>
+                        </div>
+                        <a href="{{ route('student.materials.download', [$submission->reference, $deliverable->id]) }}" class="btn btn-primary btn-sm"><x-icon name="download" class="size-4" />Download</a>
+                    </li>
+                @endforeach
+            </ul>
+        @elseif ($materialsWaitingForPayment > 0)
+            <div class="alert-info alert mt-4"><x-icon name="clock" class="mt-0.5 size-5" /><p>Your materials are ready. They will be available here as soon as the remaining balance is paid.</p></div>
+        @else
+            <p class="mt-4 text-sm text-muted">Nothing here yet. We will email you when your materials are ready.</p>
+        @endif
+    </section>
+
+    <div class="mt-8">
+        <x-chat-thread :messages="$messages" :viewer="auth()->user()" perspective="student"
+            :action="route('student.messages.store', $submission->reference)"
+            :attachment-url="fn ($m) => route('student.messages.attachment', [$submission->reference, $m->id])"
+            title="Messages" intro="Questions, feedback or updated drafts about this order. Replies come from the Zytecs Research team." placeholder="Write your question or feedback…" />
+    </div>
+
     <p class="mt-10"><a href="{{ route('student.dashboard') }}" class="link-arrow"><x-icon name="arrow-right" class="size-4 rotate-180" />Back to dashboard</a></p>
 </x-layouts.student>

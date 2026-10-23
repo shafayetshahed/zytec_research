@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Enums\NotificationStatus;
 use App\Mail\NewEnquiryReceived;
 use App\Mail\NewSubmissionReceived;
+use App\Mail\OrderUpdate;
 use App\Mail\PaymentReceived;
 use App\Mail\QuotationIssued;
 use App\Models\NotificationLog;
@@ -86,6 +87,12 @@ class SendBusinessNotification implements ShouldQueue
             NotificationLog::TYPE_NEW_SUBMISSION => new NewSubmissionReceived($log->submission ?? throw new \RuntimeException('Submission missing.')),
             NotificationLog::TYPE_NEW_ENQUIRY => new NewEnquiryReceived($log->enquiry ?? throw new \RuntimeException('Enquiry missing.')),
             NotificationLog::TYPE_QUOTATION_SENT => new QuotationIssued($log->submission ?? throw new \RuntimeException('Submission missing.')),
+            NotificationLog::TYPE_EXPERT_ASSIGNED,
+            NotificationLog::TYPE_MATERIALS_UPLOADED,
+            NotificationLog::TYPE_MATERIALS_READY,
+            NotificationLog::TYPE_MESSAGE_TO_STUDENT,
+            NotificationLog::TYPE_MESSAGE_TO_ADMIN,
+            NotificationLog::TYPE_MESSAGE_TO_TEAM => new OrderUpdate($log->submission ?? throw new \RuntimeException('Submission missing.'), $log->type),
             NotificationLog::TYPE_PAYMENT_RECEIVED => new PaymentReceived(
                 $log->submission ?? throw new \RuntimeException('Submission missing.'),
                 $log->payment ?? throw new \RuntimeException('Payment missing.'),

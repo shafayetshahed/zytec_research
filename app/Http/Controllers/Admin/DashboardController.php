@@ -6,17 +6,20 @@ use App\Enums\NotificationStatus;
 use App\Enums\PaymentStatus;
 use App\Enums\SubmissionStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Deliverable;
 use App\Models\Enquiry;
 use App\Models\NotificationLog;
 use App\Models\Payment;
 use App\Models\Quotation;
 use App\Models\Submission;
 use App\Models\User;
+use App\Services\MessageThreads;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
-    public function __invoke(): View
+    public function __invoke(Request $request, MessageThreads $threads): View
     {
         $statusCounts = Submission::query()
             ->selectRaw('status, count(*) as total')
@@ -38,6 +41,8 @@ class DashboardController extends Controller
                 'open_enquiries' => Enquiry::whereNull('handled_at')->count(),
                 'deletion_requests' => User::students()->whereNotNull('deletion_requested_at')->count(),
                 'received_month_bdt' => round(Payment::whereBetween('paid_on', [now()->startOfMonth()->toDateString(), now()->endOfMonth()->toDateString()])->get()->sum(fn (Payment $p) => $p->signedBdt()), 2),
+                'unread_messages' => (int) $threads->unreadForAdmin($request->user())->sum('unread'),
+                'materials_to_review' => Deliverable::where('status', 'pending_review')->count(),
                 'clients_with_dues' => Quotation::whereNotNull('sent_at')->with(['payments', 'submission'])->get()
                     ->filter(fn (Quotation $q) => $q->balance() > 0)->pluck('submission.user_id')->unique()->count(),
                 'awaiting_payment' => Submission::whereIn('payment_status', [PaymentStatus::AwaitingPayment, PaymentStatus::PartPaid, PaymentStatus::DepositPaid])->count(),

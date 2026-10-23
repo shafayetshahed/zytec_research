@@ -24,7 +24,7 @@ class PruneSubmissions extends Command
         $days = (int) config('zytecs.retention.closed_submission_days');
         $finalStatuses = array_map(fn (SubmissionStatus $status) => $status->value, array_filter(SubmissionStatus::cases(), fn (SubmissionStatus $status) => $status->isFinal()));
 
-        $query = Submission::with('files')
+        $query = Submission::with(['files', 'deliverables', 'messages'])
             ->whereIn('status', $finalStatuses)
             ->whereNotNull('closed_at')
             ->where('closed_at', '<', now()->subDays($days));

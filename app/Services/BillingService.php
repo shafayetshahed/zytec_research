@@ -14,7 +14,7 @@ use App\Models\SubmissionStatusChange;
  */
 class BillingService
 {
-    public function __construct(private DocumentNumberService $numbers) {}
+    public function __construct(private DocumentNumberService $numbers, private MaterialsService $materials) {}
 
     /** Work statuses that move to "In progress" once the deposit is paid. */
     private const PRE_WORK = [
@@ -57,6 +57,10 @@ class BillingService
         }
 
         $submission->save();
+
+        if ($status === PaymentStatus::PaidInFull) {
+            $this->materials->releaseReady($submission);
+        }
 
         return $status;
     }

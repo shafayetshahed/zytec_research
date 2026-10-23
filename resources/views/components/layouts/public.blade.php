@@ -18,8 +18,8 @@
         ['Contact', route('contact'), 'contact'],
     ];
     $user = auth()->user();
-    $portalUrl = $user ? ($user->isAdmin() ? route('admin.dashboard') : route('student.dashboard')) : route('login');
-    $briefUrl = $user && ! $user->isAdmin() ? route('student.submissions.create') : route('register');
+    $portalUrl = $user ? $user->homeUrl() : route('login');
+    $briefUrl = $user?->isStudent() ? route('student.submissions.create') : route('register');
 @endphp
 <!DOCTYPE html>
 <html lang="en-GB">

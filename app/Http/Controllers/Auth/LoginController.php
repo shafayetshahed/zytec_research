@@ -41,7 +41,7 @@ class LoginController extends Controller
         $user->forceFill(['last_login_at' => now()])->save();
         $audit->record('account.login', $user);
 
-        $home = $user->isAdmin() ? route('admin.dashboard') : route('student.dashboard');
+        $home = $user->homeUrl();
 
         return redirect()->intended($home);
     }

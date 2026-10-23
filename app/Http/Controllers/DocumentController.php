@@ -49,6 +49,8 @@ class DocumentController extends Controller
 
     private function resolve(Request $request, string $reference): Submission
     {
+        abort_if($request->user()->isExpert(), 403);
+
         $query = $request->user()->isAdmin() ? Submission::query() : $request->user()->submissions();
 
         return $query->where('reference', $reference)->with(['student', 'quotation.payments', 'quotation.submission.student'])->firstOrFail();

@@ -13,6 +13,8 @@
             ['Completed, closed or declined', $metrics['finished'], route('admin.submissions.index'), 'check'],
             ['Failed notifications', $metrics['failed_notifications'], route('admin.notifications.index', ['status' => 'failed']), 'circle-alert'],
             ['Received this month (BDT)', $metrics['received_month_bdt'], route('admin.accounting', ['period' => 'this_month']), 'calculator'],
+            ['Unread messages', $metrics['unread_messages'], route('admin.messages'), 'message-circle'],
+            ['Materials to review', $metrics['materials_to_review'], route('admin.submissions.index', ['materials' => 'pending']), 'eye'],
             ['Clients with dues', $metrics['clients_with_dues'], route('admin.dues', ['show' => 'due']), 'circle-alert'],
             ['Awaiting payment', $metrics['awaiting_payment'], route('admin.submissions.index', ['payment' => 'awaiting_payment']), 'clock'],
         ];
@@ -24,7 +26,7 @@
                 <a href="{{ $url }}" class="card flex h-full items-start justify-between gap-3 p-5 text-ink no-underline hover:border-royal/50">
                     <span>
                         <span class="block text-sm text-muted">{{ $label }}</span>
-                         <span class="mt-2 block font-serif text-4xl {{ in_array($label, ['Failed notifications', 'Clients with dues'], true) && $value > 0 ? 'text-danger' : '' }}">{{ is_float($value) ? number_format($value, 2) : number_format($value) }}</span>
+                         <span class="mt-2 block font-serif text-4xl {{ in_array($label, ['Failed notifications', 'Clients with dues', 'Unread messages', 'Materials to review'], true) && $value > 0 ? 'text-danger' : '' }}">{{ is_float($value) ? number_format($value, 2) : number_format($value) }}</span>
                     </span>
                     <x-icon :name="$icon" class="size-5 text-slate" />
                 </a>

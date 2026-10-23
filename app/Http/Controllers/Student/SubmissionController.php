@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Student;
 
 use App\Actions\SubmitBrief;
+use App\Enums\DeliverableStatus;
+use App\Enums\MessageChannel;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Student\StoreSubmissionRequest;
 use App\Models\Submission;
 use App\Services\AuditLogger;
+use App\Services\MessageThreads;
 use App\Support\SiteContent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -55,16 +58,20 @@ class SubmissionController extends Controller
             ->with('submitted', true);
     }
 
-    public function show(Request $request, string $reference): View
+    public function show(Request $request, string $reference, MessageThreads $threads): View
     {
         $submission = $this->ownedSubmission($request, $reference);
-        $submission->load(['files', 'quotation.payments']);
+        $submission->load(['files', 'quotation.payments', 'deliverables']);
+        $threads->markRead($submission, $request->user(), MessageChannel::Student);
 
         return view('student.submissions.show', [
             'submission' => $submission,
             // Drafts stay hidden until the administrator sends the quotation.
             'quotation' => $submission->quotation?->sent_at !== null ? $submission->quotation : null,
             'justSubmitted' => (bool) $request->session()->get('submitted'),
+            'materials' => $submission->deliverables->filter(fn ($d) => $d->isAvailableToStudent($submission))->values(),
+            'materialsWaitingForPayment' => $submission->deliverables->filter(fn ($d) => $d->status === DeliverableStatus::Approved && ! $d->isAvailableToStudent($submission))->count(),
+            'messages' => $threads->thread($submission, MessageChannel::Student),
         ]);
     }
 

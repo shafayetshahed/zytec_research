@@ -16,7 +16,7 @@ class DeleteStudentAccount
 
     public function handle(User $student): void
     {
-        $student->load('submissions.files');
+        $student->load(['submissions.files', 'submissions.deliverables', 'submissions.messages']);
         $submissionCount = $student->submissions->count();
         $studentId = $student->id;
 

@@ -55,7 +55,7 @@
                     <tbody>
                         @foreach ($submissions as $submission)
                             <tr>
-                                <td><a href="{{ route('student.submissions.show', $submission->reference) }}" class="font-mono font-medium">{{ $submission->reference }}</a></td>
+                                <td><a href="{{ route('student.submissions.show', $submission->reference) }}" class="font-mono font-medium">{{ $submission->reference }}</a>@if (($unread[$submission->id] ?? 0) > 0)<a href="{{ route('student.submissions.show', $submission->reference) }}#chat" class="badge mt-1 block w-fit bg-royal text-white no-underline">{{ $unread[$submission->id] }} new {{ Str::plural('message', $unread[$submission->id]) }}</a>@endif</td>
                                 <td class="min-w-48">{{ $submission->assignment_name }}</td>
                                 <td>@if ($submission->module_code)<span class="code-tag">{{ $submission->module_code }}</span>@else<span class="text-muted">—</span>@endif</td>
                                 <td class="max-w-56 truncate" title="{{ $submission->brief?->original_name }}">{{ $submission->brief?->original_name }}</td>

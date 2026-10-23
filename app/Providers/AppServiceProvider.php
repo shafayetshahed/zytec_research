@@ -71,6 +71,8 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('submissions', fn (Request $request) => Limit::perHour(15)->by('submit:'.$request->user()?->getKey()));
 
+        RateLimiter::for('messages', fn (Request $request) => Limit::perMinute(20)->by('messages:'.$request->user()?->getKey()));
+
         RateLimiter::for('enquiries', fn (Request $request) => Limit::perHour(5)->by('enquiry:'.$request->ip()));
 
         RateLimiter::for('downloads', fn (Request $request) => Limit::perMinute(60)->by('download:'.$request->user()?->getKey()));

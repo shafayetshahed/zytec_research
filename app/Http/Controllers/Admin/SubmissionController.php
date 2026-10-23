@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\Currency;
+use App\Enums\MessageChannel;
 use App\Enums\NotificationStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
 use App\Enums\SubmissionStatus;
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateSubmissionStatusRequest;
 use App\Jobs\SendBusinessNotification;
@@ -15,7 +17,9 @@ use App\Models\Submission;
 use App\Models\SubmissionFile;
 use App\Models\SubmissionNote;
 use App\Models\SubmissionStatusChange;
+use App\Models\User;
 use App\Services\AuditLogger;
+use App\Services\MessageThreads;
 use App\Support\SiteContent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,6 +37,7 @@ class SubmissionController extends Controller
             'q' => ['nullable', 'string', 'max:100'],
             'status' => ['nullable', Rule::enum(SubmissionStatus::class)],
             'payment' => ['nullable', Rule::enum(PaymentStatus::class)],
+            'materials' => ['nullable', 'in:pending'],
             'country' => ['nullable', 'string', 'max:60'],
             'subject' => ['nullable', 'string', 'max:100'],
             'from' => ['nullable', 'date'],
@@ -44,6 +49,7 @@ class SubmissionController extends Controller
             ->search($filters['q'] ?? null)
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
             ->when($filters['payment'] ?? null, fn ($query, $payment) => $query->where('payment_status', $payment))
+            ->when(($filters['materials'] ?? null) === 'pending', fn ($query) => $query->whereHas('deliverables', fn ($q) => $q->where('status', 'pending_review')))
             ->when($filters['country'] ?? null, fn ($query, $country) => $query->where('country', $country))
             ->when($filters['subject'] ?? null, fn ($query, $subject) => $query->where('subject', $subject))
             ->when($filters['from'] ?? null, fn ($query, $from) => $query->whereDate('submitted_at', '>=', $from))
@@ -62,9 +68,11 @@ class SubmissionController extends Controller
         ]);
     }
 
-    public function show(Submission $submission): View
+    public function show(Request $request, Submission $submission, MessageThreads $threads): View
     {
-        $submission->load(['student', 'files', 'notes.admin', 'statusChanges.admin', 'notificationLogs', 'quotation.payments.recorder']);
+        $submission->load(['student', 'expert', 'files', 'notes.admin', 'statusChanges.admin', 'notificationLogs', 'quotation.payments.recorder', 'deliverables.uploader']);
+        $threads->markRead($submission, $request->user(), MessageChannel::Student);
+        $threads->markRead($submission, $request->user(), MessageChannel::Team);
 
         return view('admin.submissions.show', [
             'submission' => $submission,
@@ -73,6 +81,9 @@ class SubmissionController extends Controller
             'currencies' => Currency::cases(),
             'methods' => PaymentMethod::cases(),
             'countries' => SiteContent::countriesOfStudy(),
+            'experts' => User::where('role', UserRole::Expert)->where('status', 'active')->orderBy('name')->get(),
+            'studentThread' => $threads->thread($submission, MessageChannel::Student),
+            'teamThread' => $threads->thread($submission, MessageChannel::Team),
         ]);
     }
 

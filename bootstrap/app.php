@@ -31,9 +31,7 @@ return Application::configure(basePath: dirname(__DIR__))
             prepend: PrivatePage::class,
         );
 
-        $middleware->redirectUsersTo(fn (Request $request) => $request->user()?->isAdmin()
-            ? route('admin.dashboard')
-            : route('student.dashboard'));
+        $middleware->redirectUsersTo(fn (Request $request) => $request->user()?->homeUrl() ?? route('home'));
 
         $middleware->trustProxies(at: env('TRUSTED_PROXIES'));
 

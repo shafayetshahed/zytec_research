@@ -81,6 +81,31 @@ The site produces three PDF documents with your logo, your details and the clien
 - **Business details**: add a postal address or registration details to the documents with `ZYTECS_INVOICE_ADDRESS` in `.env` (separate lines with `|`, for example `House 1, Road 2|Dhaka 1200|Bangladesh`). Change the closing line with `ZYTECS_INVOICE_NOTE`.
 - **Deleted payments**: if you delete a payment so a request is no longer paid in full, its invoice stops being downloadable until it is fully paid again. The invoice keeps the same number.
 
+## Team, materials and messages
+
+### Team members (your writers/experts)
+- **Team → Add team member** with their name, email and optional WhatsApp number. They receive an email invitation to set a password, then sign in to the **Team portal** (`/team`).
+- **Resend invite** if the link expires (60 minutes). **Suspend** stops them signing in immediately.
+- **What team members see:** only orders assigned to them, including the work name, module, brief files, description, delivery date and your instructions. They **never** see the student's name, email, WhatsApp number or institution, and students never see who the team member is.
+
+### Assigning and reviewing
+1. **Assign** the order: in **Team and materials**, choose the team member, add instructions and click **Save assignment**. They are emailed.
+2. **The team member uploads** process notes, suggestions and feedback for the student to learn from. Each upload requires them to confirm it is guidance, not a finished assignment, and every upload waits for review.
+3. **Review it:** the upload shows as **Awaiting review**, and the Overview has a "Materials to review" tile. Download and check it, then:
+   - **Approve** it. It is released to the student once the order is **paid in full**, or straight away if you tick **Release now** (or if there is no quotation); the student is emailed.
+   - **Send back** with a note on what to change. The team member sees your note and is emailed.
+4. **Your own uploads** are approved immediately (**Upload materials yourself**).
+
+Students see released files under **Feedback & materials** on their order, labelled as learning support not to be submitted as their own work.
+
+### Messages
+Each order has two separate threads:
+
+- **Chat with the student**: the student writes from their order page, and your replies appear as "Zytecs Research".
+- **Chat with the team member**: use it to pass on the student's feedback or questions. Neither the student nor the team member can see the other thread.
+
+Both threads accept file attachments (the same file types as briefs). New messages trigger an email alert at most every 10 minutes per conversation. Alerts never include the message text. **Messages** in the admin menu lists every conversation, unread ones first, and the Overview shows the unread count.
+
 ## Clients & dues (`/admin/dues`)
 
 Your collections page: who owes what right now, across all of each client's orders (portal and manual), for all time.

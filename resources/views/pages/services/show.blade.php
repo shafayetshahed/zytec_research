@@ -12,7 +12,7 @@
 <x-layouts.public :title="$service['title']" :description="$service['short'].' '.Str::limit($service['scope'], 90)" :breadcrumbs="[['Services', route('services.index')], [$service['title']]]" :schema="$schema">
     <x-page-header eyebrow="Service" :title="$service['title']" :lede="$service['short']" :breadcrumbs="[['Services', route('services.index')], [$service['title']]]">
         <div class="mt-8 flex flex-wrap gap-3">
-            <a href="{{ auth()->check() && ! auth()->user()->isAdmin() ? route('student.submissions.create') : route('register') }}" class="btn btn-primary">Submit your brief</a>
+            <a href="{{ auth()->user()?->isStudent() ? route('student.submissions.create') : route('register') }}" class="btn btn-primary">Submit your brief</a>
             <a href="{{ config('zytecs.business.whatsapp_url') }}" class="btn btn-whatsapp" rel="noopener" target="_blank"><x-icon name="message-circle" class="size-5" />Ask on WhatsApp</a>
         </div>
     </x-page-header>
@@ -77,7 +77,7 @@
             <div class="card p-6 lg:sticky lg:top-28">
                 <h2 class="font-serif text-xl">Start with your brief</h2>
                 <p class="mt-2 text-sm text-ink-soft">Upload it securely and we will reply on WhatsApp or email with what we can help with, the timeline and the price.</p>
-                <a href="{{ auth()->check() && ! auth()->user()->isAdmin() ? route('student.submissions.create') : route('register') }}" class="btn btn-primary mt-5 w-full">Submit your brief</a>
+                <a href="{{ auth()->user()?->isStudent() ? route('student.submissions.create') : route('register') }}" class="btn btn-primary mt-5 w-full">Submit your brief</a>
                 <a href="{{ route('how-it-works') }}" class="link-arrow mt-4 text-sm">How it works<x-icon name="arrow-right" class="size-4" /></a>
             </div>
             @if ($related->isNotEmpty())

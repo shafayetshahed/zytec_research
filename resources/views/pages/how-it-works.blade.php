@@ -33,7 +33,7 @@
                     <li class="flex gap-2"><x-icon name="check" class="mt-0.5 size-4 text-success" />Your draft, if you want feedback on it</li>
                     <li class="flex gap-2"><x-icon name="x" class="mt-0.5 size-4 text-danger" />Never your university password</li>
                 </ul>
-                <a href="{{ auth()->check() && ! auth()->user()->isAdmin() ? route('student.submissions.create') : route('register') }}" class="btn btn-primary mt-6 w-full">Submit your brief</a>
+                <a href="{{ auth()->user()?->isStudent() ? route('student.submissions.create') : route('register') }}" class="btn btn-primary mt-6 w-full">Submit your brief</a>
             </div>
         </aside>
     </section>

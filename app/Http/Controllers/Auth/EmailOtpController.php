@@ -50,7 +50,7 @@ class EmailOtpController extends Controller
         $audit->record('account.email_verified', $user);
         $request->session()->regenerate();
 
-        return redirect()->route($user->isAdmin() ? 'admin.dashboard' : 'student.dashboard')
+        return redirect()->to($user->homeUrl())
             ->with('status', $result->message());
     }
 

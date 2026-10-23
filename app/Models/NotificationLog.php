@@ -32,6 +32,18 @@ class NotificationLog extends Model
 
     public const TYPE_PAYMENT_RECEIVED = 'payment_received';
 
+    public const TYPE_EXPERT_ASSIGNED = 'expert_assigned';
+
+    public const TYPE_MATERIALS_UPLOADED = 'materials_uploaded';
+
+    public const TYPE_MATERIALS_READY = 'materials_ready';
+
+    public const TYPE_MESSAGE_TO_STUDENT = 'message_to_student';
+
+    public const TYPE_MESSAGE_TO_ADMIN = 'message_to_admin';
+
+    public const TYPE_MESSAGE_TO_TEAM = 'message_to_team';
+
     /**
      * Get the attributes that should be cast.
      *
@@ -77,6 +89,12 @@ class NotificationLog extends Model
             self::TYPE_NEW_ENQUIRY => 'New enquiry',
             self::TYPE_QUOTATION_SENT => 'Quotation to student',
             self::TYPE_PAYMENT_RECEIVED => 'Payment receipt to student',
+            self::TYPE_EXPERT_ASSIGNED => 'Order assigned to team member',
+            self::TYPE_MATERIALS_UPLOADED => 'Materials awaiting review',
+            self::TYPE_MATERIALS_READY => 'Materials ready for student',
+            self::TYPE_MESSAGE_TO_STUDENT => 'New message for student',
+            self::TYPE_MESSAGE_TO_ADMIN => 'New message for admin',
+            self::TYPE_MESSAGE_TO_TEAM => 'New message for team member',
             default => $this->type,
         };
     }

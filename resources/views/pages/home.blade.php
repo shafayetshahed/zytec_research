@@ -14,7 +14,7 @@
                     Zytecs Research helps international students plan assignments, shape research, analyse data and polish their writing, with clear explanations and honest feedback from a team with around {{ config('zytecs.business.experience_years') }} years of multidisciplinary experience.
                 </p>
                 <div class="mt-8 flex flex-wrap gap-3">
-                    <a href="{{ auth()->check() && ! auth()->user()->isAdmin() ? route('student.submissions.create') : route('register') }}" class="btn btn-primary">
+                    <a href="{{ auth()->user()?->isStudent() ? route('student.submissions.create') : route('register') }}" class="btn btn-primary">
                         <x-icon name="file-up" class="size-5" />Submit your brief
                     </a>
                     <a href="{{ config('zytecs.business.whatsapp_url') }}" class="btn btn-whatsapp" rel="noopener" target="_blank">
