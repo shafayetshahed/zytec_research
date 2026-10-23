@@ -12,7 +12,7 @@ class SitemapController extends Controller
         $urls = collect([
             route('home'), route('about'), route('services.index'), route('subjects'),
             route('portfolio'), route('how-it-works'), route('why-choose-us'), route('faq'),
-            route('contact'), route('academic-integrity'), route('privacy'), route('terms'),
+            route('contact'), route('confidentiality'), route('academic-integrity'), route('privacy'), route('terms'),
         ])->merge(SiteContent::services()->keys()->map(fn (string $slug) => route('services.show', $slug)));
 
         return response()

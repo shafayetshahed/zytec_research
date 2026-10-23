@@ -122,6 +122,11 @@ class PageController extends Controller
         return view('pages.academic-integrity');
     }
 
+    public function confidentiality(): View
+    {
+        return view('pages.confidentiality');
+    }
+
     public function privacy(): View
     {
         return view('pages.privacy');

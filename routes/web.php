@@ -28,6 +28,7 @@ Route::controller(PageController::class)->group(function () {
     Route::get('/why-choose-us', 'whyChooseUs')->name('why-choose-us');
     Route::get('/faq', 'faq')->name('faq');
     Route::get('/academic-integrity', 'academicIntegrity')->name('academic-integrity');
+    Route::get('/confidentiality', 'confidentiality')->name('confidentiality');
     Route::get('/privacy-policy', 'privacy')->name('privacy');
     Route::get('/terms', 'terms')->name('terms');
 });

@@ -186,7 +186,7 @@
             <div>
                 <x-icon name="shield-check" class="size-7 text-royal" />
                 <h3 class="mt-4 text-xl">Confidential by default</h3>
-                <p class="mt-2 text-ink-soft">Briefs are stored privately and seen only by our team. We never publish your details, and never ask for university passwords.</p>
+                <p class="mt-2 text-ink-soft">Briefs are stored privately and seen only by our team. We never publish your details, and never ask for university passwords. <a href="{{ route('confidentiality') }}">How we protect you</a>.</p>
             </div>
             <div>
                 <x-icon name="scale" class="size-7 text-royal" />

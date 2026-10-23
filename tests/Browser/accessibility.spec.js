@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { latestOtpFor } from './helpers.js';
 
-const publicPages = ['/', '/about', '/services', '/services/data-analysis', '/subjects', '/portfolio', '/how-it-works', '/why-choose-us', '/faq', '/contact', '/privacy-policy', '/terms', '/academic-integrity', '/register', '/login', '/forgot-password', '/does-not-exist'];
+const publicPages = ['/', '/about', '/services', '/services/data-analysis', '/subjects', '/portfolio', '/how-it-works', '/why-choose-us', '/faq', '/contact', '/privacy-policy', '/terms', '/academic-integrity', '/confidentiality', '/register', '/login', '/forgot-password', '/does-not-exist'];
 
 async function scan(page, label) {
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze();

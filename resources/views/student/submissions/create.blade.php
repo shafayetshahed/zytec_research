@@ -77,7 +77,7 @@
                 <x-icon name="lock" class="mt-0.5 size-5" />
                 <div class="text-sm">
                     <p class="font-semibold">How we handle your documents</p>
-                    <p class="mt-1">Files are stored privately, are only visible to you and authorised Zytecs Research staff, are never published, and are not used to train AI systems. Do not include passwords or login details in any file. See the <a href="{{ route('privacy') }}" target="_blank" rel="noopener">Privacy Policy</a> for retention periods.</p>
+                    <p class="mt-1">Files are stored privately, are only visible to you and authorised Zytecs Research staff, are never published, and are not used to train AI systems. Do not include passwords or login details in any file. See our <a href="{{ route('confidentiality') }}" target="_blank" rel="noopener">confidentiality commitment</a> and <a href="{{ route('privacy') }}" target="_blank" rel="noopener">Privacy Policy</a>.</p>
                 </div>
             </div>
             <div class="field">

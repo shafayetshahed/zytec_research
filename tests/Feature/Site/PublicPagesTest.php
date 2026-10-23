@@ -27,6 +27,7 @@ class PublicPagesTest extends TestCase
             'faq' => ['/faq', 'Frequently asked questions'],
             'contact' => ['/contact', 'Talk to us'],
             'integrity' => ['/academic-integrity', 'Academic integrity'],
+            'confidentiality' => ['/confidentiality', 'Strictly confidential'],
             'privacy' => ['/privacy-policy', 'Privacy policy'],
             'terms' => ['/terms', 'Terms of service'],
         ];
@@ -100,7 +101,7 @@ class PublicPagesTest extends TestCase
         $locs = array_map('strval', iterator_to_array($xml->xpath('//*[local-name()="loc"]'), false));
         $this->assertContains(route('home'), $locs);
         $this->assertContains(route('services.show', 'research-proposals'), $locs);
-        $this->assertCount(12 + SiteContent::services()->count(), $locs);
+        $this->assertCount(13 + SiteContent::services()->count(), $locs);
         foreach ($locs as $loc) {
             $this->assertStringNotContainsString('/admin', $loc);
             $this->assertStringNotContainsString('/student', $loc);
@@ -209,5 +210,18 @@ class PublicPagesTest extends TestCase
                 }
             }
         }
+    }
+
+    public function test_confidentiality_page_is_honest_about_legal_exceptions(): void
+    {
+        $html = $this->get('/confidentiality')->assertOk()->getContent();
+
+        $this->assertStringContainsString('We do not share any of this with your university or college', $html);
+        $this->assertStringContainsString('When the law requires it', $html);
+        $this->assertStringContainsString('not a claim of certification', $html);
+        foreach (['UK GDPR', 'Australian Privacy Principles', 'PIPEDA', 'California Consumer Privacy Act'] as $framework) {
+            $this->assertStringContainsString($framework, $html);
+        }
+        $this->assertStringNotContainsString('fully compliant', strtolower($html));
     }
 }

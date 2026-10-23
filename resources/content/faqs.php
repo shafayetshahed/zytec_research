@@ -26,7 +26,7 @@ return [
     ],
 
     'Confidentiality and data' => [
-        ['q' => 'Is my information kept confidential?', 'a' => 'Yes. Uploaded files are stored privately and are only accessible to you and authorised Zytecs Research staff. We never publish your name, institution, documents or results. See our Privacy Policy for details on how long we keep data.'],
+        ['q' => 'Is my information kept confidential?', 'a' => 'Yes. Uploaded files are stored privately and are only accessible to you and authorised Zytecs Research staff. We never publish your name, institution, documents or results. See our Confidentiality page and Privacy Policy for details.'],
         ['q' => 'Will you ask for my university login?', 'a' => 'Never. Do not share university portal, email or learning-platform passwords with us or anyone else. We will never ask for them.'],
         ['q' => 'Can I ask you to delete my data?', 'a' => 'Yes. You can request deletion from your profile page or by contacting us. Some records may need to be kept for a limited period for legal or accounting reasons, as explained in the Privacy Policy.'],
     ],

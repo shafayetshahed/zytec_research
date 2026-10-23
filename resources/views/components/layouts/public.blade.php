@@ -128,6 +128,7 @@
                     <li><a class="text-ink no-underline hover:underline" href="{{ route('portfolio') }}">Portfolio</a></li>
                     <li><a class="text-ink no-underline hover:underline" href="{{ route('subjects') }}">Subjects</a></li>
                     <li><a class="text-ink no-underline hover:underline" href="{{ route('faq') }}">FAQs</a></li>
+                    <li><a class="text-ink no-underline hover:underline" href="{{ route('confidentiality') }}">Confidentiality</a></li>
                 </ul>
             </nav>
 
@@ -155,6 +156,7 @@
             <div class="container-page flex flex-col gap-3 py-5 text-sm text-muted sm:flex-row sm:items-center sm:justify-between">
                 <p>&copy; {{ now()->year }} Zytecs Research. All rights reserved.</p>
                 <ul class="flex flex-wrap gap-x-5 gap-y-1">
+                    <li><a class="text-muted hover:text-ink" href="{{ route('confidentiality') }}">Confidentiality</a></li>
                     <li><a class="text-muted hover:text-ink" href="{{ route('privacy') }}">Privacy policy</a></li>
                     <li><a class="text-muted hover:text-ink" href="{{ route('terms') }}">Terms of service</a></li>
                     <li><a class="text-muted hover:text-ink" href="{{ route('academic-integrity') }}">Academic integrity</a></li>
