@@ -60,7 +60,7 @@
                             <td class="whitespace-nowrap">{{ $areas[$entry['area']] }}</td>
                             <td>{{ implode(', ', $entry['tasks']) }}</td>
                             <td class="font-mono whitespace-nowrap">{{ implode(', ', $entry['years']) }}</td>
-                            <td class="whitespace-nowrap">{{ $entry['countries'] ? implode(', ', $entry['countries']) : 'Not recorded' }}</td>
+                            <td class="whitespace-nowrap">@if ($entry['countries']){{ implode(', ', $entry['countries']) }}@else<span class="text-muted" aria-label="No country recorded">—</span>@endif</td>
                         </tr>
                     @empty
                         <tr><td colspan="6" class="py-8 text-center text-muted">No records match these filters.</td></tr>
