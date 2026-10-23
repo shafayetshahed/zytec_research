@@ -12,6 +12,8 @@
             ['Awaiting student response', $metrics['awaiting'], route('admin.submissions.index', ['status' => 'awaiting_student_response']), 'clock'],
             ['Completed, closed or declined', $metrics['finished'], route('admin.submissions.index'), 'check'],
             ['Failed notifications', $metrics['failed_notifications'], route('admin.notifications.index', ['status' => 'failed']), 'circle-alert'],
+            ['Received this month (BDT)', $metrics['received_month_bdt'], route('admin.accounting', ['period' => 'this_month']), 'calculator'],
+            ['Awaiting payment', $metrics['awaiting_payment'], route('admin.submissions.index', ['payment' => 'awaiting_payment']), 'clock'],
         ];
     @endphp
 
@@ -21,7 +23,7 @@
                 <a href="{{ $url }}" class="card flex h-full items-start justify-between gap-3 p-5 text-ink no-underline hover:border-royal/50">
                     <span>
                         <span class="block text-sm text-muted">{{ $label }}</span>
-                        <span class="mt-2 block font-serif text-4xl {{ $label === 'Failed notifications' && $value > 0 ? 'text-danger' : '' }}">{{ number_format($value) }}</span>
+                         <span class="mt-2 block font-serif text-4xl {{ $label === 'Failed notifications' && $value > 0 ? 'text-danger' : '' }}">{{ is_float($value) ? number_format($value, 2) : number_format($value) }}</span>
                     </span>
                     <x-icon :name="$icon" class="size-5 text-slate" />
                 </a>

@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\Currency;
 use App\Enums\NotificationStatus;
+use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Enums\SubmissionStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateSubmissionStatusRequest;
@@ -29,6 +32,7 @@ class SubmissionController extends Controller
         $filters = $request->validate([
             'q' => ['nullable', 'string', 'max:100'],
             'status' => ['nullable', Rule::enum(SubmissionStatus::class)],
+            'payment' => ['nullable', Rule::enum(PaymentStatus::class)],
             'country' => ['nullable', 'string', 'max:60'],
             'subject' => ['nullable', 'string', 'max:100'],
             'from' => ['nullable', 'date'],
@@ -36,9 +40,10 @@ class SubmissionController extends Controller
         ]);
 
         $submissions = Submission::query()
-            ->with('student')
+            ->with(['student', 'quotation.payments'])
             ->search($filters['q'] ?? null)
             ->when($filters['status'] ?? null, fn ($query, $status) => $query->where('status', $status))
+            ->when($filters['payment'] ?? null, fn ($query, $payment) => $query->where('payment_status', $payment))
             ->when($filters['country'] ?? null, fn ($query, $country) => $query->where('country', $country))
             ->when($filters['subject'] ?? null, fn ($query, $subject) => $query->where('subject', $subject))
             ->when($filters['from'] ?? null, fn ($query, $from) => $query->whereDate('submitted_at', '>=', $from))
@@ -51,6 +56,7 @@ class SubmissionController extends Controller
             'submissions' => $submissions,
             'filters' => $filters,
             'statuses' => SubmissionStatus::cases(),
+            'paymentStatuses' => PaymentStatus::cases(),
             'countries' => SiteContent::countriesOfStudy(),
             'subjects' => array_values(SiteContent::portfolioAreas()),
         ]);
@@ -58,12 +64,15 @@ class SubmissionController extends Controller
 
     public function show(Submission $submission): View
     {
-        $submission->load(['student', 'files', 'notes.admin', 'statusChanges.admin', 'notificationLogs']);
+        $submission->load(['student', 'files', 'notes.admin', 'statusChanges.admin', 'notificationLogs', 'quotation.payments.recorder']);
 
         return view('admin.submissions.show', [
             'submission' => $submission,
             'history' => $submission->student->submissions()->whereKeyNot($submission->id)->latest('submitted_at')->limit(10)->get(),
             'statuses' => SubmissionStatus::cases(),
+            'currencies' => Currency::cases(),
+            'methods' => PaymentMethod::cases(),
+            'countries' => SiteContent::countriesOfStudy(),
         ]);
     }
 
@@ -74,6 +83,12 @@ class SubmissionController extends Controller
 
         if ($newStatus === $oldStatus) {
             return back()->with('status', 'The status is already '.$newStatus->label().'.');
+        }
+
+        $quotation = $submission->quotation;
+
+        if ($newStatus === SubmissionStatus::Completed && $quotation?->sent_at !== null && $quotation->balance() > 0) {
+            return back()->with('error', 'This request still has '.$quotation->currency->format($quotation->balance()).' outstanding. Record the payment before marking it completed.');
         }
 
         DB::transaction(function () use ($request, $submission, $newStatus, $oldStatus) {

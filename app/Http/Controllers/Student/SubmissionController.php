@@ -58,10 +58,12 @@ class SubmissionController extends Controller
     public function show(Request $request, string $reference): View
     {
         $submission = $this->ownedSubmission($request, $reference);
-        $submission->load('files');
+        $submission->load(['files', 'quotation.payments']);
 
         return view('student.submissions.show', [
             'submission' => $submission,
+            // Drafts stay hidden until the administrator sends the quotation.
+            'quotation' => $submission->quotation?->sent_at !== null ? $submission->quotation : null,
             'justSubmitted' => (bool) $request->session()->get('submitted'),
         ]);
     }

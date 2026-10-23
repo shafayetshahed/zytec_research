@@ -90,6 +90,26 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Accounting
+    |--------------------------------------------------------------------------
+    |
+    | Exchange rates to BDT come from the free, keyless fawazahmed0
+    | currency-api (CC0), with a mirror as fallback. {date} is YYYY-MM-DD or
+    | "latest"; {base} is a lower-case currency code. Rates are suggestions:
+    | the administrator can always overwrite them with the rate received.
+    |
+    */
+
+    'accounting' => [
+        'base_currency' => 'BDT',
+        'rate_urls' => [
+            'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@{date}/v1/currencies/{base}.json',
+            'https://{date}.currency-api.pages.dev/v1/currencies/{base}.json',
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Retention
     |--------------------------------------------------------------------------
     |

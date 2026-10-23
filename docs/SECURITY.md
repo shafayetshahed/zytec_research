@@ -40,8 +40,16 @@ This document lists the controls in place, the results of the independent review
 - SQL via Eloquent/query builder only; `LIKE` wildcards escaped; filters validated against enums/allow-lists.
 - Contact form honeypot and rate limit.
 
+### Quotations, payments and accounting
+- Only administrators can create quotations, record or delete payments, and view or export accounting (server-side `role:admin`).
+- Students see only their own sent quotations; drafts and exchange rates are never shown to them.
+- Money is stored as fixed-point decimals. Each payment keeps its own exchange rate and BDT value, so reports never change after the fact.
+- Payment records survive deletion of the request, keeping only the reference and country, for accounting purposes. The privacy policy says so.
+- CSV export neutralises spreadsheet formulas in free-text fields.
+- Exchange-rate lookups send only the currency code and date to the rate service, with a 5-second timeout and caching; no personal data leaves the server.
+
 ### Logging and audit
-- `audit_logs` records sign-ins, failed OTP attempts (reason only), verification, profile/password changes, deletion requests, submissions, downloads, status changes, notes, suspensions, deletions and notification retries, with actor, subject, IP and time.
+- `audit_logs` records quotations saved and sent, payments recorded and deleted, sign-ins, failed OTP attempts (reason only), verification, profile/password changes, deletion requests, submissions, downloads, status changes, notes, suspensions, deletions and notification retries, with actor, subject, IP and time.
 - Notification logs store a sanitised error class only.
 - No passwords, OTPs, tokens, SMTP credentials or document contents are logged by the application.
 

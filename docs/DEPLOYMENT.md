@@ -12,6 +12,7 @@ Production target: **https://research.zytecs.com**. Deployment has **not** been 
 | HTTPS | Required (Let's Encrypt or the host's certificate) |
 | Cron | One entry, every minute (see below) |
 | Disk | Private storage for briefs under `storage/app/private` — outside `public/` |
+| Outbound HTTPS | Allowed to `cdn.jsdelivr.net` and `*.currency-api.pages.dev` for exchange rates (if blocked, enter rates manually) |
 | PHP limits | `upload_max_filesize = 25M`, `post_max_size = 110M` (brief + 4 supporting files at 20 MB), `max_execution_time = 60`, `memory_limit = 256M` |
 
 Shared hosting (cPanel) works if you can point the domain's document root at `public/` and add a cron job. If the host forces `public_html`, put the project one level above it and make `public_html` contain only the contents of `public/` (adjust `index.php` paths) — never place the whole project inside `public_html`.

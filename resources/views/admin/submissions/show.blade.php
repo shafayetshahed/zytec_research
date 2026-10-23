@@ -9,8 +9,8 @@
         <x-status-badge :status="$submission->status" class="text-sm" />
     </div>
 
-    <div class="mt-8 grid gap-6 xl:grid-cols-3">
-        <div class="grid content-start gap-6 xl:col-span-2">
+    <div class="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div class="grid min-w-0 content-start gap-6 xl:col-span-2">
             <section class="card p-6" aria-labelledby="student-heading">
                 <h2 id="student-heading" class="font-serif text-xl">Student</h2>
                 <dl class="mt-4 grid gap-4 sm:grid-cols-3">
@@ -44,6 +44,8 @@
                 </ul>
             </section>
 
+            @include('admin.submissions.partials.billing')
+
             <section class="card p-6" aria-labelledby="notes-heading">
                 <h2 id="notes-heading" class="font-serif text-xl">Internal notes <span class="ml-2 align-middle text-xs font-sans font-semibold tracking-wide text-muted uppercase">Admin only</span></h2>
                 <form method="POST" action="{{ route('admin.submissions.notes', $submission) }}" class="mt-4 grid gap-3">
@@ -66,7 +68,7 @@
             </section>
         </div>
 
-        <div class="grid content-start gap-6">
+        <div class="grid min-w-0 content-start gap-6">
             <section class="card p-6" aria-labelledby="status-form-heading">
                 <h2 id="status-form-heading" class="font-serif text-xl">Update status</h2>
                 <form method="POST" action="{{ route('admin.submissions.status', $submission) }}" class="mt-4 grid gap-4">
@@ -79,7 +81,7 @@
                                 <option value="{{ $status->value }}" @selected($submission->status === $status)>{{ $status->label() }}</option>
                             @endforeach
                         </select>
-                        <p class="hint">Only record events that have actually happened (for example, choose "Quotation sent" after sending it).</p>
+                        <p class="hint">Sending a quotation and recording the deposit update the status automatically. "Completed" is only allowed once the balance is paid.</p>
                     </div>
                     <div class="field">
                         <label for="status-note" class="label">Note<span class="label-optional">(optional, internal)</span></label>

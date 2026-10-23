@@ -20,6 +20,39 @@
     </div>
     <p class="mt-3 max-w-2xl text-ink-soft">{{ $submission->status->studentDescription() }}</p>
 
+    @if ($quotation)
+        <section class="mt-8 overflow-hidden rounded-lg border-2 border-royal/40 bg-card shadow-[var(--shadow-soft)]" aria-labelledby="quote-heading">
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-royal px-6 py-4 text-white">
+                <h2 id="quote-heading" class="font-serif text-2xl text-white">Your quotation</h2>
+                <x-payment-badge :status="$submission->payment_status" class="text-sm" />
+            </div>
+            <div class="p-6">
+                <p class="text-ink-soft"><strong class="text-ink">{{ $submission->assignment_name }}</strong> <span class="code-tag ml-1">{{ $submission->module_code }}</span>@if ($quotation->work_due_date), delivery by <strong class="text-ink">{{ $quotation->work_due_date->format('j F Y') }}</strong>@endif</p>
+                <p class="mt-4 font-serif text-4xl text-royal sm:text-5xl">{{ $quotation->currency->format($quotation->total_amount) }}</p>
+                <dl class="mt-6 grid gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-3">
+                    <div class="bg-paper p-4"><dt class="text-sm text-muted">Deposit to start</dt><dd class="mt-1 font-mono text-lg">{{ $quotation->currency->format($quotation->deposit_amount) }}</dd></div>
+                    <div class="bg-paper p-4"><dt class="text-sm text-muted">Paid so far</dt><dd class="mt-1 font-mono text-lg text-success">{{ $quotation->currency->format($quotation->amountPaid()) }}</dd></div>
+                    <div class="bg-paper p-4"><dt class="text-sm text-muted">Balance due</dt><dd class="mt-1 font-mono text-lg {{ $quotation->balance() > 0 ? 'text-danger' : 'text-success' }}">{{ $quotation->currency->format($quotation->balance()) }}</dd></div>
+                </dl>
+                @if ($quotation->message)
+                    <p class="mt-5 whitespace-pre-line text-ink-soft">{{ $quotation->message }}</p>
+                @endif
+                <p class="mt-5 text-sm text-muted">We will confirm with you on WhatsApp before starting. Work begins once the deposit is received; the balance is due before completion.</p>
+                @if ($quotation->payments->isNotEmpty())
+                    <h3 class="mt-6 font-sans text-sm font-semibold">Payments received</h3>
+                    <ul class="mt-2 divide-y divide-line-soft text-sm">
+                        @foreach ($quotation->payments as $payment)
+                            <li class="flex flex-wrap justify-between gap-2 py-2">
+                                <span>{{ $payment->paid_on->format('j M Y') }} · {{ $payment->method->label() }}</span>
+                                <span class="font-mono {{ $payment->type === \App\Enums\PaymentType::Refund ? 'text-danger' : '' }}">{{ $payment->type === \App\Enums\PaymentType::Refund ? 'Refund −' : '' }}{{ $payment->currency->format($payment->amount) }}</span>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+        </section>
+    @endif
+
     <div class="mt-8 grid gap-8 lg:grid-cols-3">
         <section class="card p-6 lg:col-span-2" aria-labelledby="details-heading">
             <h2 id="details-heading" class="font-serif text-xl">Details</h2>

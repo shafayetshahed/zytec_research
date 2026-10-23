@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PaymentStatus;
 use App\Enums\SubmissionStatus;
 use Database\Factories\SubmissionFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -29,10 +30,12 @@ use Illuminate\Support\Carbon;
  * @property string $contact_email
  * @property string $whatsapp_number
  * @property SubmissionStatus $status
+ * @property PaymentStatus $payment_status
  * @property Carbon $submitted_at
  * @property Carbon|null $closed_at
  * @property-read User $student
  * @property-read SubmissionFile|null $brief
+ * @property-read Quotation|null $quotation
  */
 #[Fillable([
     'assignment_name', 'module_code', 'institution', 'country', 'subject',
@@ -52,6 +55,7 @@ class Submission extends Model
     {
         return [
             'status' => SubmissionStatus::class,
+            'payment_status' => PaymentStatus::class,
             'deadline' => 'date',
             'submitted_at' => 'datetime',
             'closed_at' => 'datetime',
@@ -85,6 +89,22 @@ class Submission extends Model
     public function brief(): HasOne
     {
         return $this->hasOne(SubmissionFile::class)->where('is_brief', true);
+    }
+
+    /**
+     * @return HasOne<Quotation, $this>
+     */
+    public function quotation(): HasOne
+    {
+        return $this->hasOne(Quotation::class);
+    }
+
+    /**
+     * @return HasMany<Payment, $this>
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class)->orderBy('paid_on')->orderBy('id');
     }
 
     /**

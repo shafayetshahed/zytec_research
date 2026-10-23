@@ -5,6 +5,8 @@ namespace App\Jobs;
 use App\Enums\NotificationStatus;
 use App\Mail\NewEnquiryReceived;
 use App\Mail\NewSubmissionReceived;
+use App\Mail\PaymentReceived;
+use App\Mail\QuotationIssued;
 use App\Models\NotificationLog;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -40,7 +42,7 @@ class SendBusinessNotification implements ShouldQueue
 
     public function handle(): void
     {
-        $log = NotificationLog::with(['submission.student', 'submission.brief', 'enquiry'])->find($this->notificationLogId);
+        $log = NotificationLog::with(['submission.student', 'submission.brief', 'submission.quotation.payments', 'enquiry', 'payment'])->find($this->notificationLogId);
 
         if ($log === null || $log->status === NotificationStatus::Sent) {
             return;
@@ -83,6 +85,11 @@ class SendBusinessNotification implements ShouldQueue
         return match ($log->type) {
             NotificationLog::TYPE_NEW_SUBMISSION => new NewSubmissionReceived($log->submission ?? throw new \RuntimeException('Submission missing.')),
             NotificationLog::TYPE_NEW_ENQUIRY => new NewEnquiryReceived($log->enquiry ?? throw new \RuntimeException('Enquiry missing.')),
+            NotificationLog::TYPE_QUOTATION_SENT => new QuotationIssued($log->submission ?? throw new \RuntimeException('Submission missing.')),
+            NotificationLog::TYPE_PAYMENT_RECEIVED => new PaymentReceived(
+                $log->submission ?? throw new \RuntimeException('Submission missing.'),
+                $log->payment ?? throw new \RuntimeException('Payment missing.'),
+            ),
             default => throw new \RuntimeException('Unknown notification type.'),
         };
     }

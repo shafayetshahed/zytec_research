@@ -219,8 +219,9 @@
         @apply border-warning/30 bg-warning-bg text-warning;
     }
 
+    /* relative: screen-reader-only text inside cells must stay within the table's scroll box. */
     .data-table {
-        @apply w-full border-collapse text-left text-sm;
+        @apply relative w-full border-collapse text-left text-sm;
     }
 
     .data-table th {

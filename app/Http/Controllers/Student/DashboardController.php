@@ -13,7 +13,7 @@ class DashboardController extends Controller
         $user = $request->user();
 
         $submissions = $user->submissions()
-            ->with('brief')
+            ->with(['brief', 'quotation.payments'])
             ->latest('submitted_at')
             ->paginate(10);
 

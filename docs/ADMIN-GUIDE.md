@@ -25,9 +25,35 @@ Live counts from the database: registered students, verified accounts, total sub
 
 Statuses: New → Under review → Awaiting student response → Quotation sent → Accepted → In progress → Completed, or Closed / Declined.
 
+## Quotations and payments
+
+Students pay you outside the website (bank transfer, bKash, Nagad, Rocket, Wise, PayPal, cash). The portal records quotations and payments; it does not take card payments.
+
+1. **Create the quotation**: on a submission, open **Quotation and payments**. Choose the currency (AUD, GBP, USD, CAD, BDT or MYR), the total price, the deposit needed to start (0 if none), an optional delivery date, the country (used for accounting) and an optional message to the student, such as how to pay.
+   - **Save as draft** keeps it private.
+   - **Save and send to student** emails the quotation and shows it, highlighted, on the student's request page and dashboard. The status moves to "Quotation sent". You can edit and re-send it; the currency is locked once payments exist.
+2. **Confirm on WhatsApp** with the student as usual.
+3. **Record each payment** under **Record a payment or refund**: amount, date received, method and transaction reference.
+   - **Exchange rate**: leave the rate blank to use the market rate for that date (from a free rate service), or type the rate you actually received in BDT per 1 unit. BDT quotes need no rate. The rate and the BDT value are saved with the payment and never change later.
+   - **Receipt**: the student gets a receipt email unless you untick the box. Refunds never send a receipt.
+   - **Payment status** updates automatically: Awaiting payment → Part paid → Deposit paid → Paid in full. When the deposit is reached, the work status moves to "In progress".
+4. **Complete the request**: a request with a quotation can only be marked **Completed** once it is **Paid in full**. Mistakes can be removed with **Delete**; deletions are recorded in the audit log.
+
+## Accounting (`/admin/accounting`)
+
+- **Periods**: this month, last month, this year, last year, all time, or custom dates. Filter by country and currency.
+- **Totals**: net income in BDT, payments received, refunds given, and an estimate of everything still outstanding at today's rates.
+- **Breakdowns**:
+  - by currency and by country, with the native amount and the BDT value;
+  - by month and by year, with a column per currency and a BDT total;
+  - outstanding balances per request, what was quoted in the period, and every transaction.
+- **Export CSV** downloads the transactions for the selected filters, for your accountant or spreadsheet.
+- **How income is counted**: on the date each payment was received (cash basis), using the rate saved with that payment.
+- **Retention**: payment records are kept even after a request is deleted under the retention policy. They keep only the request reference and country, not the student's details or documents.
+
 ## Email notifications
 
-Each new brief and enquiry creates a notification record. **Sent** means the mail server accepted it. **Pending** means it is queued or waiting for an automatic retry. **Failed** means automatic retries were used up. Use **Retry now** on the submission page or in Notifications after fixing mail settings. Briefs are never lost because of email problems.
+Each new brief, enquiry, quotation and payment receipt creates a notification record. **Sent** means the mail server accepted it. **Pending** means it is queued or waiting for an automatic retry. **Failed** means automatic retries were used up. Use **Retry now** on the submission page or in Notifications after fixing mail settings. Briefs are never lost because of email problems.
 
 ## Students
 

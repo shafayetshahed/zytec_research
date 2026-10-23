@@ -49,6 +49,10 @@ class AccessControlTest extends TestCase
             ['get', route('admin.enquiries.index')],
             ['get', route('admin.enquiries.show', $enquiry)],
             ['post', route('admin.enquiries.handled', $enquiry)],
+            ['put', route('admin.submissions.quotation', $submission)],
+            ['post', route('admin.submissions.payments.store', $submission)],
+            ['get', route('admin.accounting')],
+            ['get', route('admin.accounting.export')],
             ['get', route('admin.settings')],
             ['get', route('admin.audit')],
         ];

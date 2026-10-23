@@ -11,6 +11,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int|null $submission_id
  * @property int|null $enquiry_id
+ * @property int|null $payment_id
  * @property string $type
  * @property string $recipient
  * @property NotificationStatus $status
@@ -26,6 +27,10 @@ class NotificationLog extends Model
     public const TYPE_NEW_SUBMISSION = 'new_submission';
 
     public const TYPE_NEW_ENQUIRY = 'new_enquiry';
+
+    public const TYPE_QUOTATION_SENT = 'quotation_sent';
+
+    public const TYPE_PAYMENT_RECEIVED = 'payment_received';
 
     /**
      * Get the attributes that should be cast.
@@ -50,6 +55,14 @@ class NotificationLog extends Model
     }
 
     /**
+     * @return BelongsTo<Payment, $this>
+     */
+    public function payment(): BelongsTo
+    {
+        return $this->belongsTo(Payment::class);
+    }
+
+    /**
      * @return BelongsTo<Enquiry, $this>
      */
     public function enquiry(): BelongsTo
@@ -62,6 +75,8 @@ class NotificationLog extends Model
         return match ($this->type) {
             self::TYPE_NEW_SUBMISSION => 'New brief',
             self::TYPE_NEW_ENQUIRY => 'New enquiry',
+            self::TYPE_QUOTATION_SENT => 'Quotation to student',
+            self::TYPE_PAYMENT_RECEIVED => 'Payment receipt to student',
             default => $this->type,
         };
     }

@@ -104,6 +104,9 @@ Route::prefix('admin')->name('admin.')->middleware(['private', 'auth', 'active',
     Route::put('/submissions/{submission}/status', [Admin\SubmissionController::class, 'updateStatus'])->name('submissions.status');
     Route::post('/submissions/{submission}/notes', [Admin\SubmissionController::class, 'storeNote'])->name('submissions.notes');
     Route::post('/submissions/{submission}/notifications/{notification}/retry', [Admin\SubmissionController::class, 'retryNotification'])->name('submissions.notifications.retry');
+    Route::put('/submissions/{submission}/quotation', [Admin\QuotationController::class, 'save'])->name('submissions.quotation');
+    Route::post('/submissions/{submission}/payments', [Admin\PaymentController::class, 'store'])->name('submissions.payments.store');
+    Route::delete('/submissions/{submission}/payments/{payment}', [Admin\PaymentController::class, 'destroy'])->name('submissions.payments.destroy');
     Route::get('/submissions/{submission}/files/{file}', [Admin\SubmissionController::class, 'download'])->middleware('throttle:downloads')->name('submissions.files.download');
 
     Route::get('/students', [Admin\StudentController::class, 'index'])->name('students.index');
@@ -118,6 +121,9 @@ Route::prefix('admin')->name('admin.')->middleware(['private', 'auth', 'active',
     Route::get('/enquiries', [Admin\EnquiryController::class, 'index'])->name('enquiries.index');
     Route::get('/enquiries/{enquiry}', [Admin\EnquiryController::class, 'show'])->name('enquiries.show');
     Route::post('/enquiries/{enquiry}/handled', [Admin\EnquiryController::class, 'markHandled'])->name('enquiries.handled');
+
+    Route::get('/accounting', [Admin\AccountingController::class, 'index'])->name('accounting');
+    Route::get('/accounting/export', [Admin\AccountingController::class, 'export'])->name('accounting.export');
 
     Route::get('/settings', [Admin\SettingsController::class, 'index'])->name('settings');
     Route::get('/audit-log', [Admin\SettingsController::class, 'audit'])->name('audit');

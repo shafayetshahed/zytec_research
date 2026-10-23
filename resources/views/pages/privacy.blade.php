@@ -35,6 +35,7 @@
             <ul>
                 <li>Submissions marked completed, closed or declined, and their files, are deleted automatically {{ config('zytecs.retention.closed_submission_days') }} days after closure.</li>
                 <li>Your account remains until you ask us to delete it.</li>
+                <li>Payment records (amount, currency, date, method and request reference, without your documents) are kept for accounting and tax purposes even after a request is deleted.</li>
                 <li>Website enquiries are kept for up to 12 months.</li>
                 <li>Security and audit records are kept for as long as needed to protect the service.</li>
             </ul>

@@ -6,11 +6,11 @@ Run date: **23 October 2026**, macOS (Apple Silicon), PHP 8.5.12, Laravel 13.38.
 
 | Check | Result |
 | --- | --- |
-| PHPUnit feature + unit tests (SQLite, in-memory) | **206 passed**, 0 failed, 0 skipped — 1,112 assertions |
-| Same suite against **MariaDB 13.0.2** | **206 passed**, 0 failed — 1,112 assertions. Migrations, rollback and re-migration also succeeded. Verified that the suite really used MariaDB by pointing it at a dead port (it then failed). |
-| Line coverage (`app/`, Xdebug) | **94.6 %** overall |
-| Playwright browser tests | **47 passed**, 0 failed |
-| axe-core (WCAG 2.0/2.1/2.2 A + AA) | **0 serious/critical violations** on 17 public pages, OTP, student dashboard, submission form (clean and error state), profile and 5 admin pages |
+| PHPUnit feature + unit tests (SQLite, in-memory) | **232 passed**, 0 failed, 0 skipped — 1,285 assertions (re-run 23 Oct 2026 after adding the confidentiality page and quotations/payments/accounting) |
+| Same suite against **MariaDB 13.0.2** | **206 passed**, 0 failed — 1,112 assertions (run before the billing feature; re-run on MariaDB before deploying). Migrations, rollback and re-migration also succeeded. Verified that the suite really used MariaDB by pointing it at a dead port (it then failed). |
+| Line coverage (`app/`, Xdebug) | **94.7 %** overall |
+| Playwright browser tests | **48 passed**, 0 failed (journeys now include sending a quotation, recording a deposit and checking accounting) |
+| axe-core (WCAG 2.0/2.1/2.2 A + AA) | **0 serious/critical violations** on 18 public pages, OTP, student dashboard, submission form (clean and error state), profile and 6 admin pages including Accounting |
 | Larastan (PHPStan level 6) | **0 errors** |
 | Laravel Pint | **Pass** |
 | `composer audit` | No advisories |
@@ -46,6 +46,9 @@ Line coverage is not functional completeness; the traceability matrix in `TEST-P
 | 7 | axe-core | Inline links distinguished by colour only | Links underlined by default | `accessibility.spec.js` |
 | 8 | Lighthouse | 11 font files preloaded, delaying first paint | Unused weights removed; only two faces preloaded | Lighthouse re-run (below) |
 | 9–15 | Independent security review | Host-header reset links; remember-me not revoked on password change; Markdown link injection in emails; no account-wide login limit; bidi characters in filenames; string `in:` rule; macro-enabled DOCX accepted | See `SECURITY.md` | `SecurityRegressionTest` (8 tests) |
+
+| 16 | axe-core | Empty-state text placed directly inside a `<dl>` on the accounting page | Empty state moved outside the list | `accessibility.spec.js` |
+| 17 | Responsive check | Admin submission page overflowed by 313 px on phones: screen-reader-only text in the wide payments table was absolutely positioned outside the table's scroll box | Tables made a positioning context; admin grids use explicit single columns on mobile | `journeys.spec.js` (`snapAllSizes` now names overflowing elements) |
 
 Test-side corrections (not application defects) were also made: timestamp precision in one assertion, ambiguous Playwright locators, a duplicate fixture email, Laravel 13's renamed CSRF middleware class, the test host in a link-checking regex, and a static trusted-hosts setting that leaked between tests. One placeholder test that asserted nothing was removed.
 

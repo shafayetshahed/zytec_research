@@ -30,6 +30,7 @@ class SubmissionFactory extends Factory
             'contact_email' => fn (array $attributes) => User::find($attributes['user_id'])->email,
             'whatsapp_number' => fn (array $attributes) => User::find($attributes['user_id'])->whatsapp_number ?? '+447700900000',
             'status' => SubmissionStatus::New,
+            'payment_status' => 'not_quoted',
             'submitted_at' => now(),
         ];
     }

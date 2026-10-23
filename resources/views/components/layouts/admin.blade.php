@@ -4,6 +4,7 @@
         ['Overview', route('admin.dashboard'), 'admin.dashboard', 'layout-dashboard'],
         ['Submissions', route('admin.submissions.index'), 'admin.submissions.*', 'inbox'],
         ['Students', route('admin.students.index'), 'admin.students.*', 'users'],
+        ['Accounting', route('admin.accounting'), 'admin.accounting*', 'calculator'],
         ['Enquiries', route('admin.enquiries.index'), 'admin.enquiries.*', 'message-circle'],
         ['Notifications', route('admin.notifications.index'), 'admin.notifications.*', 'bell'],
         ['Audit log', route('admin.audit'), 'admin.audit', 'history'],

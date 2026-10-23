@@ -49,6 +49,7 @@
                             <th scope="col">File</th>
                             <th scope="col">Submitted</th>
                             <th scope="col">Status</th>
+                            <th scope="col">Price</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -60,6 +61,18 @@
                                 <td class="max-w-56 truncate" title="{{ $submission->brief?->original_name }}">{{ $submission->brief?->original_name }}</td>
                                 <td class="whitespace-nowrap"><time datetime="{{ $submission->submitted_at->toIso8601String() }}">{{ $submission->submitted_at->format('j M Y') }}</time></td>
                                 <td><x-status-badge :status="$submission->status" /></td>
+                                <td class="whitespace-nowrap">
+                                    @if ($submission->quotation?->sent_at)
+                                        <span class="font-mono">{{ $submission->quotation->currency->format($submission->quotation->total_amount) }}</span>
+                                        @if ($submission->quotation->balance() > 0)
+                                            <span class="block text-xs font-semibold text-danger">{{ $submission->quotation->currency->format($submission->quotation->balance()) }} due</span>
+                                        @else
+                                            <span class="block text-xs font-semibold text-success">Paid in full</span>
+                                        @endif
+                                    @else
+                                        <span class="text-muted">Awaiting quote</span>
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

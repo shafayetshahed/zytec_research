@@ -2,7 +2,7 @@
     <nav aria-label="Breadcrumb" class="text-sm"><a href="{{ route('admin.students.index') }}">Students</a> <span class="text-muted">/</span> <span aria-current="page">{{ $student->name }}</span></nav>
     <h1 class="mt-3 font-serif text-3xl">{{ $student->name }}</h1>
 
-    <div class="mt-6 grid gap-6 xl:grid-cols-3">
+    <div class="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <section class="card p-6 xl:col-span-2" aria-labelledby="profile-heading">
             <h2 id="profile-heading" class="font-serif text-xl">Profile</h2>
             <dl class="mt-4 grid gap-4 sm:grid-cols-2">

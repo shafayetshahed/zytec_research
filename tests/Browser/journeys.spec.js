@@ -85,6 +85,7 @@ test('student journey: register, verify OTP, submit brief, sign out and back in'
 });
 
 test('admin journey: find submission, download, change status, add note, check notification', async ({ page }) => {
+    test.setTimeout(90_000);
     expect(reference, 'student journey must run first').toBeTruthy();
 
     await page.goto('/login');
@@ -132,6 +133,32 @@ test('admin journey: find submission, download, change status, add note, check n
     await expect(page.getByText('E2E internal-only note')).toBeVisible();
     await expect(page.getByText('E2E: reviewing requirements')).toBeVisible();
     await snapAllSizes(page, 'admin-submission-detail', expect);
+
+    // Quotation: the form starts open when no quotation exists
+    await expect(page.locator('details:has(> summary:text-is("Create quotation"))')).toHaveAttribute('open', '');
+    await page.getByLabel('Currency').selectOption('AUD');
+    await page.getByLabel('Total price').fill('250');
+    await page.getByLabel('Deposit to start').fill('100');
+    await page.getByLabel(/Message to the student/).fill('E2E: deposit by bank transfer, details on WhatsApp.');
+    await page.getByRole('button', { name: 'Save and send to student' }).click();
+    await expect(page.getByText('Quotation sent.')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Quotation and payments' }).getByText('Awaiting payment')).toBeVisible();
+
+    // Record the deposit with a manual exchange rate
+    await page.getByText('Record a payment or refund').click();
+    await page.getByLabel('Amount (AUD)').fill('100');
+    await page.getByLabel('Method').selectOption('wise');
+    await page.getByLabel(/Rate \(BDT per 1 AUD\)/).fill('80');
+    await page.getByRole('button', { name: 'Record', exact: true }).click();
+    await expect(page.getByText(/Payment of AUD 100.00 recorded \(Deposit paid\)/)).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Status history' }).getByText('In progress', { exact: true })).toBeVisible();
+    await snapAllSizes(page, 'admin-billing', expect);
+
+    // Accounting reflects the payment in BDT
+    await page.getByRole('navigation', { name: 'Administration' }).getByRole('link', { name: 'Accounting' }).click();
+    await expect(page.getByText('BDT 8,000.00').first()).toBeVisible();
+    await expect(page.getByText('AUD 150.00').first()).toBeVisible();
+    await snapAllSizes(page, 'admin-accounting', expect);
 });
 
 test('student cannot see internal notes and sees the new status', async ({ page }) => {
@@ -141,7 +168,13 @@ test('student cannot see internal notes and sees the new status', async ({ page 
     await page.getByRole('button', { name: 'Sign in' }).click();
     await page.getByRole('link', { name: reference }).click();
 
-    await expect(page.getByText('Under review').first()).toBeVisible();
+    await expect(page.getByText('In progress').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Your quotation' })).toBeVisible();
+    await expect(page.getByText('AUD 250.00')).toBeVisible();
+    await expect(page.getByText('AUD 150.00')).toBeVisible();
+    await expect(page.getByText('E2E: deposit by bank transfer, details on WhatsApp.')).toBeVisible();
+    await expect(page.getByText('80.000000')).toHaveCount(0);
+    await snapAllSizes(page, 'student-quotation', expect);
     await expect(page.getByText('E2E internal-only note')).toHaveCount(0);
     await expect(page.getByText('E2E: reviewing requirements')).toHaveCount(0);
 

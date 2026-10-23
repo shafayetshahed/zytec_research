@@ -45,7 +45,13 @@ export async function snapAllSizes(page, name, expect) {
     for (const [device, size] of Object.entries(sizes)) {
         await page.setViewportSize(size);
         const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-        expect(overflow, `${name} overflows horizontally on ${device}`).toBeLessThanOrEqual(0);
+        const culprits = overflow > 0 ? await page.evaluate(() => [...document.querySelectorAll('body *')]
+            .filter((el) => el.getBoundingClientRect().right > window.innerWidth + 1
+                // Content inside a scrolling or clipping container does not widen the page.
+                && !(function clipped(node) { for (let p = node.parentElement; p; p = p.parentElement) { if (['auto', 'scroll', 'hidden', 'clip'].includes(getComputedStyle(p).overflowX)) return true; } return false; })(el))
+            .slice(0, 5)
+            .map((el) => `${el.tagName.toLowerCase()}.${[...el.classList].slice(0, 4).join('.')} "${(el.textContent || '').trim().slice(0, 30)}" (${Math.round(el.getBoundingClientRect().right)}px)`)) : [];
+        expect(overflow, `${name} overflows horizontally on ${device}: ${culprits.join(', ')}`).toBeLessThanOrEqual(0);
         await page.screenshot({ path: `${screenshotDir}/${device}-${name}.png`, fullPage: true });
     }
     await page.setViewportSize(original);
