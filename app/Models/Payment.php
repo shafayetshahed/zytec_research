@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\Currency;
+use App\Enums\OrderSource;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentType;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +20,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $receipt_number
  * @property string $submission_reference
  * @property string|null $country
+ * @property OrderSource $source
  * @property PaymentType $type
  * @property Currency $currency
  * @property string $amount
@@ -42,6 +44,7 @@ class Payment extends Model
     {
         return [
             'type' => PaymentType::class,
+            'source' => OrderSource::class,
             'currency' => Currency::class,
             'method' => PaymentMethod::class,
             'amount' => 'decimal:2',

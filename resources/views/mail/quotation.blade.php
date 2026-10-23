@@ -6,7 +6,7 @@ Hello {{ \App\Support\MarkdownText::escape($submission->student->name) }},
 Thank you for your request. We have reviewed it and here is our quotation.
 
 <x-mail::panel>
-**{{ \App\Support\MarkdownText::escape($submission->assignment_name) }}** ({{ \App\Support\MarkdownText::escape($submission->module_code) }})
+**{{ \App\Support\MarkdownText::escape($submission->assignment_name) }}**@if ($submission->module_code) ({{ \App\Support\MarkdownText::escape($submission->module_code) }})@endif
 
 **Total price:** {{ $quotation->currency->format($quotation->total_amount) }}
 @if ((float) $quotation->deposit_amount > 0)

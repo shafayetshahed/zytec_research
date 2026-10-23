@@ -49,6 +49,7 @@ class PaymentController extends Controller
             $payment->quotation_id = $quotation->id;
             $payment->submission_reference = $submission->reference;
             $payment->country = $quotation->country ?? $submission->country;
+            $payment->source = $submission->source;
             $payment->type = $type;
             $payment->currency = $quotation->currency;
             $payment->amount = number_format($amount, 2, '.', '');
@@ -75,7 +76,7 @@ class PaymentController extends Controller
             'currency' => $payment->currency->value,
         ]);
 
-        if ($type === PaymentType::Payment && $request->boolean('notify_student', true)) {
+        if ($type === PaymentType::Payment && $request->boolean('notify_student', true) && filled($submission->contact_email)) {
             $log = new NotificationLog;
             $log->submission_id = $submission->id;
             $log->payment_id = $payment->id;

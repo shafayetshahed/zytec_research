@@ -31,6 +31,7 @@ class SubmissionFactory extends Factory
             'whatsapp_number' => fn (array $attributes) => User::find($attributes['user_id'])->whatsapp_number ?? '+447700900000',
             'status' => SubmissionStatus::New,
             'payment_status' => 'not_quoted',
+            'source' => 'portal',
             'submitted_at' => now(),
         ];
     }

@@ -6,7 +6,7 @@ Run date: **23 October 2026**, macOS (Apple Silicon), PHP 8.5.12, Laravel 13.38.
 
 | Check | Result |
 | --- | --- |
-| PHPUnit feature + unit tests (SQLite, in-memory) | **241 passed**, 0 failed, 0 skipped — 1,353 assertions (re-run 23 Oct 2026 after adding the confidentiality page, billing/accounting and PDF documents) |
+| PHPUnit feature + unit tests (SQLite, in-memory) | **255 passed**, 0 failed, 0 skipped — 1,447 assertions (re-run 23 Oct 2026 after adding confidentiality, billing/accounting, PDF documents, payment references and manual orders) |
 | Same suite against **MariaDB 13.0.2** | **206 passed**, 0 failed — 1,112 assertions (run before the billing feature; re-run on MariaDB before deploying). Migrations, rollback and re-migration also succeeded. Verified that the suite really used MariaDB by pointing it at a dead port (it then failed). |
 | Line coverage (`app/`, Xdebug) | **94.7 %** overall |
 | Playwright browser tests | **48 passed**, 0 failed (journeys now include sending a quotation, recording a deposit and checking accounting) |
@@ -48,6 +48,7 @@ Line coverage is not functional completeness; the traceability matrix in `TEST-P
 | 9–15 | Independent security review | Host-header reset links; remember-me not revoked on password change; Markdown link injection in emails; no account-wide login limit; bidi characters in filenames; string `in:` rule; macro-enabled DOCX accepted | See `SECURITY.md` | `SecurityRegressionTest` (8 tests) |
 
 | 16 | axe-core | Empty-state text placed directly inside a `<dl>` on the accounting page | Empty state moved outside the list | `accessibility.spec.js` |
+| 18 | Compiled-view lint | `@endif@if` written without a space on the student order page, so Blade printed the second `@if` as text and the page failed to render | Space added; all 138 compiled views now lint-checked | `ManualOrdersTest`, `BillingTest` page renders |
 | 17 | Responsive check | Admin submission page overflowed by 313 px on phones: screen-reader-only text in the wide payments table was absolutely positioned outside the table's scroll box | Tables made a positioning context; admin grids use explicit single columns on mobile | `journeys.spec.js` (`snapAllSizes` now names overflowing elements) |
 
 Test-side corrections (not application defects) were also made: timestamp precision in one assertion, ambiguous Playwright locators, a duplicate fixture email, Laravel 13's renamed CSRF middleware class, the test host in a link-checking regex, and a static trusted-hosts setting that leaked between tests. One placeholder test that asserted nothing was removed.

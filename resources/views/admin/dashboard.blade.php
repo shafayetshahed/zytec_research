@@ -58,7 +58,7 @@
                             <tr>
                                 <td><a href="{{ route('admin.submissions.show', $submission) }}" class="font-mono">{{ $submission->reference }}</a></td>
                                 <td>{{ $submission->student->name }}</td>
-                                <td><span class="code-tag">{{ $submission->module_code }}</span></td>
+                                <td>@if ($submission->module_code)<span class="code-tag">{{ $submission->module_code }}</span>@else<span class="text-muted">—</span>@endif</td>
                                 <td class="whitespace-nowrap">{{ $submission->submitted_at->format('j M Y H:i') }}</td>
                                 <td><x-status-badge :status="$submission->status" /></td>
                             </tr>

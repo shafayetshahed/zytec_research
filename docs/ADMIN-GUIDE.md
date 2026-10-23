@@ -39,6 +39,25 @@ Students pay you outside the website (bank transfer, bKash, Nagad, Rocket, Wise,
    - **Payment status** updates automatically: Awaiting payment → Part paid → Deposit paid → Paid in full. When the deposit is reached, the work status moves to "In progress".
 4. **Complete the request**: a request with a quotation can only be marked **Completed** once it is **Paid in full**. Mistakes can be removed with **Delete**; deletions are recorded in the audit log.
 
+## Clients and manual orders (WhatsApp, phone, email)
+
+Orders taken outside the portal go into the same records, so accounting covers everything.
+
+1. **Add the client once.** Go to **Students & clients → Add client**. Only the name is required; you can also add a WhatsApp number, email and country.
+   - **One profile per person**: a person who sometimes orders in the portal and sometimes on WhatsApp keeps a single profile. If they already registered in the portal, just pick them; don't add them again.
+   - **Portal access later**: if you add an email address, the client can later use **Forgot password** on the sign-in page to set a password, verify their email and see their orders in the portal.
+2. **Add the order.** Click **New manual order**, from Accounting, from Students & clients, or from the client's own page, where the client is pre-selected. Fill in:
+   - where the order came from (WhatsApp, phone, email, in person or other);
+   - the work name, with the module code if you have one;
+   - the country, currency, price, deposit/advance and order date;
+   - optionally, the delivery date and internal notes.
+
+   The order gets its own reference (for example `ZR-2610-K7Q2MX`) and quotation number. Its status starts as **Accepted**.
+3. **Record payments** on the order's page exactly as for portal orders. The deposit moves the work to **In progress**, the receipt PDF is available for sharing on WhatsApp, and the final invoice is issued when it is paid in full.
+4. **Emails** go to the client only if they have an email address (you can tick **Email the quotation PDF** when adding the order). Manual orders never trigger the "New brief" email to the business inbox.
+
+In **Accounting**, filter by **Source** to compare portal and WhatsApp income. The **By client** table shows what each client paid in the period and still owes now.
+
 ## Order and payment reference
 
 Every request has one reference, created when the student submits it (for example `ZR-2610-K7Q2MX`). Students are asked to:

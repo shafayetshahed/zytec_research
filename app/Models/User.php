@@ -19,8 +19,10 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property string $name
- * @property string $email
+ * @property string|null $email
  * @property string|null $whatsapp_number
+ * @property string|null $country
+ * @property int|null $created_by
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property UserRole $role
@@ -31,7 +33,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-#[Fillable(['name', 'email', 'password', 'whatsapp_number'])]
+#[Fillable(['name', 'email', 'password', 'whatsapp_number', 'country'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -80,6 +82,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isStudent(): bool
     {
         return $this->role === UserRole::Student;
+    }
+
+    /**
+     * True for client profiles an administrator created for off-site orders.
+     */
+    public function isManualClient(): bool
+    {
+        return $this->created_by !== null;
+    }
+
+    /**
+     * Best available contact line for admin screens.
+     */
+    public function contactSummary(): string
+    {
+        return collect([$this->email, $this->whatsapp_number])->filter()->implode(' · ') ?: 'No contact details';
     }
 
     public function isActive(): bool

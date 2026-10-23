@@ -4,7 +4,7 @@
         <tr>
             <td>
                 <strong>Academic support: {{ $submission->assignment_name }}</strong><br>
-                <span class="muted">Module {{ $submission->module_code }}@if ($quotation->work_due_date) · Delivery by {{ $quotation->work_due_date->format('j F Y') }}@endif</span>
+                <span class="muted">{{ collect([$submission->module_code ? 'Module '.$submission->module_code : null, $quotation->work_due_date ? 'Delivery by '.$quotation->work_due_date->format('j F Y') : null])->filter()->implode(' · ') }}</span>
             </td>
             <td class="num">{{ number_format((float) $quotation->total_amount, 2) }}</td>
         </tr>

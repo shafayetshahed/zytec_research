@@ -116,6 +116,14 @@ Route::prefix('admin')->name('admin.')->middleware(['private', 'auth', 'active',
     Route::delete('/submissions/{submission}/payments/{payment}', [Admin\PaymentController::class, 'destroy'])->name('submissions.payments.destroy');
     Route::get('/submissions/{submission}/files/{file}', [Admin\SubmissionController::class, 'download'])->middleware('throttle:downloads')->name('submissions.files.download');
 
+    Route::get('/clients/create', [Admin\ClientController::class, 'create'])->name('clients.create');
+    Route::post('/clients', [Admin\ClientController::class, 'store'])->name('clients.store');
+    Route::get('/students/{student}/edit', [Admin\ClientController::class, 'edit'])->whereNumber('student')->name('clients.edit');
+    Route::put('/students/{student}', [Admin\ClientController::class, 'update'])->whereNumber('student')->name('clients.update');
+
+    Route::get('/orders/create', [Admin\ManualOrderController::class, 'create'])->name('orders.create');
+    Route::post('/orders', [Admin\ManualOrderController::class, 'store'])->name('orders.store');
+
     Route::get('/students', [Admin\StudentController::class, 'index'])->name('students.index');
     Route::get('/students/{student}', [Admin\StudentController::class, 'show'])->whereNumber('student')->name('students.show');
     Route::post('/students/{student}/suspend', [Admin\StudentController::class, 'suspend'])->name('students.suspend');

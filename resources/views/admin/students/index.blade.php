@@ -1,5 +1,14 @@
 <x-layouts.admin title="Students">
-    <h1 class="font-serif text-3xl">Students</h1>
+    <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+            <h1 class="font-serif text-3xl">Students and clients</h1>
+            <p class="mt-1 text-muted">Portal sign-ups and clients you added for WhatsApp, phone or email orders.</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('admin.clients.create') }}" class="btn btn-outline btn-sm"><x-icon name="user" class="size-4" />Add client</a>
+            <a href="{{ route('admin.orders.create') }}" class="btn btn-primary btn-sm"><x-icon name="file-text" class="size-4" />New manual order</a>
+        </div>
+    </div>
     <form method="GET" action="{{ route('admin.students.index') }}" class="card mt-6 flex flex-wrap items-end gap-4 p-5" role="search" aria-label="Search students">
         <div class="field min-w-64 flex-1">
             <label for="q" class="label">Search</label>
@@ -23,13 +32,13 @@
         @else
             <table class="data-table">
                 <caption class="sr-only">Registered students</caption>
-                <thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">WhatsApp</th><th scope="col">Registered</th><th scope="col">Submissions</th><th scope="col">Account</th></tr></thead>
+                <thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">WhatsApp</th><th scope="col">Registered</th><th scope="col">Orders</th><th scope="col">Account</th></tr></thead>
                 <tbody>
                     @foreach ($students as $student)
                         <tr>
                             <td><a href="{{ route('admin.students.show', $student) }}" class="font-medium">{{ $student->name }}</a></td>
-                            <td class="break-all">{{ $student->email }} @if ($student->email_verified_at)<span class="badge bg-success-bg text-success">Verified</span>@else<span class="badge bg-warning-bg text-warning">Unverified</span>@endif</td>
-                            <td class="font-mono whitespace-nowrap">{{ $student->whatsapp_number }}</td>
+                            <td class="break-all">{{ $student->email ?? '—' }} @if ($student->email_verified_at)<span class="badge bg-success-bg text-success">Verified</span>@elseif ($student->isManualClient())<span class="badge bg-paper-deep text-ink">Added by admin</span>@else<span class="badge bg-warning-bg text-warning">Unverified</span>@endif</td>
+                            <td class="font-mono whitespace-nowrap">{{ $student->whatsapp_number ?? '—' }}</td>
                             <td class="whitespace-nowrap">{{ $student->created_at->format('j M Y') }}</td>
                             <td class="font-mono">{{ $student->submissions_count }}</td>
                             <td>

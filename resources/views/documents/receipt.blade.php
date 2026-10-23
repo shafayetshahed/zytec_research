@@ -8,7 +8,7 @@
             <tr>
                 <td>
                     <strong>{{ $payment->paid_on->format('j F Y') }}</strong><br>
-                    <span class="muted">For: {{ $submission->assignment_name }} ({{ $submission->module_code }})</span>
+                    <span class="muted">For: {{ $submission->assignment_name }}@if ($submission->module_code) ({{ $submission->module_code }})@endif</span>
                     @if ($quotation->number)<br><span class="muted">Quotation {{ $quotation->number }}</span>@endif
                 </td>
                 <td>{{ $payment->method->label() }}@if ($payment->reference)<br><span class="muted">Ref: {{ $payment->reference }}</span>@endif</td>

@@ -12,7 +12,7 @@
         <td>
             <div class="label">Bill to</div>
             <strong>{{ $submission->student->name }}</strong><br>
-            {{ $submission->contact_email }}<br>
+            @if ($submission->contact_email){{ $submission->contact_email }}<br>@endif
             @if ($quotation->country)<span class="muted">{{ $quotation->country }}</span><br>@endif
             <span class="muted">Order reference: <strong>{{ $submission->reference }}</strong></span>
         </td>

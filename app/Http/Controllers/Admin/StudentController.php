@@ -48,7 +48,7 @@ class StudentController extends Controller
 
         return view('admin.students.show', [
             'student' => $student,
-            'submissions' => $student->submissions()->latest('submitted_at')->get(),
+            'submissions' => $student->submissions()->with('quotation.payments')->latest('submitted_at')->get(),
         ]);
     }
 
@@ -82,8 +82,8 @@ class StudentController extends Controller
         abort_unless($student->isStudent(), 404);
 
         $request->validate(
-            ['confirm_email' => ['required', 'string', Rule::in([$student->email])]],
-            ['confirm_email.in' => 'Type the student\'s email address exactly to confirm deletion.'],
+            ['confirm_email' => ['required', 'string', Rule::in([$student->email ?? $student->name])]],
+            ['confirm_email.in' => $student->email ? 'Type the student\'s email address exactly to confirm deletion.' : 'Type the client\'s name exactly to confirm deletion.'],
         );
 
         $deleteStudent->handle($student);

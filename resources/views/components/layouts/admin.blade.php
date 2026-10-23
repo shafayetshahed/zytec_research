@@ -3,8 +3,8 @@
     $links = [
         ['Overview', route('admin.dashboard'), 'admin.dashboard', 'layout-dashboard'],
         ['Submissions', route('admin.submissions.index'), 'admin.submissions.*', 'inbox'],
-        ['Students', route('admin.students.index'), 'admin.students.*', 'users'],
-        ['Accounting', route('admin.accounting'), 'admin.accounting*', 'calculator'],
+        ['Students & clients', route('admin.students.index'), 'admin.students.*|admin.clients.*', 'users'],
+        ['Accounting', route('admin.accounting'), 'admin.accounting*|admin.orders.*', 'calculator'],
         ['Enquiries', route('admin.enquiries.index'), 'admin.enquiries.*', 'message-circle'],
         ['Notifications', route('admin.notifications.index'), 'admin.notifications.*', 'bell'],
         ['Audit log', route('admin.audit'), 'admin.audit', 'history'],
@@ -32,7 +32,7 @@
                 <ul class="flex gap-1 lg:flex-col">
                     @foreach ($links as [$label, $url, $pattern, $icon])
                         <li>
-                            <a href="{{ $url }}" @if (request()->routeIs($pattern)) aria-current="page" @endif
+                            <a href="{{ $url }}" @if (request()->routeIs(...explode("|", $pattern))) aria-current="page" @endif
                                class="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium whitespace-nowrap text-white/80 no-underline hover:bg-white/10 hover:text-white aria-[current=page]:bg-white/15 aria-[current=page]:text-white">
                                 <x-icon :name="$icon" class="size-4" />{{ $label }}
                             </a>

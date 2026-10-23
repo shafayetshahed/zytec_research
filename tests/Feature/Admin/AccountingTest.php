@@ -122,7 +122,7 @@ class AccountingTest extends TestCase
 
         $response->assertOk()->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
         $csv = $response->streamedContent();
-        $this->assertStringContainsString('Date,Submission,Country,Type,Currency,Amount', $csv);
+        $this->assertStringContainsString('Date,Submission,Client,Source,Country,Type,Currency,Amount', $csv);
         $this->assertStringContainsString('2026-09-20', $csv);
         $this->assertStringContainsString('-1560.00', $csv);
         $this->assertStringNotContainsString('2025-12-30', $csv);

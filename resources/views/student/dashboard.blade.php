@@ -57,7 +57,7 @@
                             <tr>
                                 <td><a href="{{ route('student.submissions.show', $submission->reference) }}" class="font-mono font-medium">{{ $submission->reference }}</a></td>
                                 <td class="min-w-48">{{ $submission->assignment_name }}</td>
-                                <td><span class="code-tag">{{ $submission->module_code }}</span></td>
+                                <td>@if ($submission->module_code)<span class="code-tag">{{ $submission->module_code }}</span>@else<span class="text-muted">—</span>@endif</td>
                                 <td class="max-w-56 truncate" title="{{ $submission->brief?->original_name }}">{{ $submission->brief?->original_name }}</td>
                                 <td class="whitespace-nowrap"><time datetime="{{ $submission->submitted_at->toIso8601String() }}">{{ $submission->submitted_at->format('j M Y') }}</time></td>
                                 <td><x-status-badge :status="$submission->status" /></td>

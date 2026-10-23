@@ -9,10 +9,13 @@
             <h1 class="font-serif text-3xl">Accounting</h1>
             <p class="mt-1 text-muted">{{ $from->format('j M Y') }} – {{ $to->format('j M Y') }}. Income is counted on the date each payment was received; taka values use the rate saved with each payment.</p>
         </div>
-        <a href="{{ route('admin.accounting.export', request()->query()) }}" class="btn btn-outline btn-sm"><x-icon name="download" class="size-4" />Export CSV</a>
+        <div class="flex flex-wrap gap-2">
+            <a href="{{ route('admin.orders.create') }}" class="btn btn-primary btn-sm"><x-icon name="file-text" class="size-4" />New manual order</a>
+            <a href="{{ route('admin.accounting.export', request()->query()) }}" class="btn btn-outline btn-sm"><x-icon name="download" class="size-4" />Export CSV</a>
+        </div>
     </div>
 
-    <form method="GET" action="{{ route('admin.accounting') }}" class="card mt-6 grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-6 lg:items-end" aria-label="Filter accounting">
+    <form method="GET" action="{{ route('admin.accounting') }}" class="card mt-6 grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-7 lg:items-end" aria-label="Filter accounting">
         <div class="field lg:col-span-2">
             <label for="period" class="label">Period</label>
             <select id="period" name="period" class="input">
@@ -41,7 +44,16 @@
                 @endforeach
             </select>
         </div>
-        <div class="flex items-center gap-3 lg:col-span-6">
+        <div class="field">
+            <label for="source" class="label">Source</label>
+            <select id="source" name="source" class="input">
+                <option value="">All sources</option>
+                @foreach ($sources as $source)
+                    <option value="{{ $source->value }}" @selected(($filters['source'] ?? '') === $source->value)>{{ $source->label() }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="flex items-center gap-3 lg:col-span-7">
             <button type="submit" class="btn btn-ink btn-sm"><x-icon name="filter" class="size-4" />Show</button>
             <a href="{{ route('admin.accounting') }}" class="text-sm">Reset</a>
         </div>
@@ -56,14 +68,14 @@
     </ul>
 
     <div class="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-2">
-        @foreach (['By currency' => $byCurrency, 'By country' => $byCountry] as $heading => $rows)
+        @foreach (['By currency' => $byCurrency, 'By country' => $byCountry, 'By source' => $bySource] as $heading => $rows)
             <section class="card overflow-x-auto" aria-label="{{ $heading }}">
                 <h2 class="border-b border-line px-5 py-4 font-serif text-xl">{{ $heading }}</h2>
                 @if ($rows->isEmpty())
                     <p class="p-5 text-sm text-muted">No payments in this period.</p>
                 @else
                     <table class="data-table">
-                        <thead><tr><th scope="col">{{ $heading === 'By currency' ? 'Currency' : 'Country' }}</th><th scope="col">Received (native)</th><th scope="col" class="text-right">In BDT</th></tr></thead>
+                        <thead><tr><th scope="col">{{ ['By currency' => 'Currency', 'By country' => 'Country', 'By source' => 'Order source'][$heading] }}</th><th scope="col">Received (native)</th><th scope="col" class="text-right">In BDT</th></tr></thead>
                         <tbody>
                             @foreach ($rows as $label => $row)
                                 <tr>
@@ -78,6 +90,27 @@
             </section>
         @endforeach
     </div>
+
+    <section class="card mt-6 overflow-x-auto" aria-labelledby="client-heading">
+        <h2 id="client-heading" class="border-b border-line px-5 py-4 font-serif text-xl">By client</h2>
+        @if ($byClient->isEmpty())
+            <p class="p-5 text-sm text-muted">No payments or outstanding balances.</p>
+        @else
+            <table class="data-table">
+                <thead><tr><th scope="col">Client</th><th scope="col">Paid in period (native)</th><th scope="col" class="text-right">Paid in BDT</th><th scope="col">Still owed now</th></tr></thead>
+                <tbody>
+                    @foreach ($byClient as $row)
+                        <tr>
+                            <th scope="row" class="!text-sm !normal-case !tracking-normal !text-ink">@if ($row['id'])<a href="{{ route('admin.students.show', $row['id']) }}">{{ $row['name'] }}</a>@else{{ $row['name'] }}@endif</th>
+                            <td class="font-mono text-xs">@forelse ($row['native'] as $code => $amount){{ \App\Enums\Currency::from($code)->format($amount) }}@if (! $loop->last)<br>@endif @empty — @endforelse</td>
+                            <td class="text-right font-mono">{{ $bdt($row['bdt']) }}</td>
+                            <td class="font-mono text-xs text-danger">@forelse ($row['owed'] as $code => $amount){{ \App\Enums\Currency::from($code)->format($amount) }}@if (! $loop->last)<br>@endif @empty <span class="text-success">Nothing</span> @endforelse</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+    </section>
 
     @foreach (['Monthly income' => $byMonth, 'Yearly income' => $byYear] as $heading => $rows)
         <section class="card mt-6 overflow-x-auto" aria-label="{{ $heading }}">
@@ -116,12 +149,12 @@
                 <p class="p-5 text-sm text-muted">Nothing outstanding.</p>
             @else
                 <table class="data-table">
-                    <thead><tr><th scope="col">Submission</th><th scope="col">Country</th><th scope="col" class="text-right">Total</th><th scope="col" class="text-right">Paid</th><th scope="col" class="text-right">Balance</th><th scope="col">Delivery</th></tr></thead>
+                    <thead><tr><th scope="col">Order</th><th scope="col">Client</th><th scope="col" class="text-right">Total</th><th scope="col" class="text-right">Paid</th><th scope="col" class="text-right">Balance</th><th scope="col">Delivery</th></tr></thead>
                     <tbody>
                         @foreach ($outstanding as $quotation)
                             <tr>
                                 <td><a href="{{ route('admin.submissions.show', $quotation->submission) }}#billing" class="font-mono">{{ $quotation->submission->reference }}</a><br><span class="text-xs text-muted">{{ Str::limit($quotation->submission->assignment_name, 40) }}</span></td>
-                                <td>{{ $quotation->country ?? '—' }}</td>
+                                <td>{{ $quotation->submission->student->name }}<br><span class="text-xs text-muted">{{ $quotation->submission->source->label() }}@if ($quotation->country) · {{ $quotation->country }}@endif</span></td>
                                 <td class="text-right font-mono whitespace-nowrap">{{ $quotation->currency->format($quotation->total_amount) }}</td>
                                 <td class="text-right font-mono whitespace-nowrap">{{ $quotation->currency->format($quotation->amountPaid()) }}</td>
                                 <td class="text-right font-mono whitespace-nowrap text-danger">{{ $quotation->currency->format($quotation->balance()) }}</td>
@@ -162,12 +195,13 @@
             <p class="p-5 text-sm text-muted">No payments in this period.</p>
         @else
             <table class="data-table">
-                <thead><tr><th scope="col">Date</th><th scope="col">Submission</th><th scope="col">Country</th><th scope="col">Type</th><th scope="col" class="text-right">Amount</th><th scope="col" class="text-right">Rate</th><th scope="col" class="text-right">BDT</th><th scope="col">Method</th></tr></thead>
+                <thead><tr><th scope="col">Date</th><th scope="col">Order</th><th scope="col">Client</th><th scope="col">Country</th><th scope="col">Type</th><th scope="col" class="text-right">Amount</th><th scope="col" class="text-right">Rate</th><th scope="col" class="text-right">BDT</th><th scope="col">Method</th></tr></thead>
                 <tbody>
                     @foreach ($ledger as $payment)
                         <tr>
                             <td class="whitespace-nowrap">{{ $payment->paid_on->format('j M Y') }}</td>
                             <td>@if ($payment->submission_id)<a href="{{ route('admin.submissions.show', $payment->submission_reference) }}#billing" class="font-mono">{{ $payment->submission_reference }}</a>@else<span class="font-mono text-muted" title="Submission deleted under the retention policy">{{ $payment->submission_reference }}</span>@endif</td>
+                            <td>{{ $payment->submission->student->name ?? 'Deleted client' }}<br><span class="text-xs text-muted">{{ $payment->source->label() }}</span></td>
                             <td>{{ $payment->country ?? '—' }}</td>
                             <td>{{ $payment->type->label() }}</td>
                             <td class="text-right font-mono whitespace-nowrap {{ $payment->type === \App\Enums\PaymentType::Refund ? 'text-danger' : '' }}">{{ $payment->type === \App\Enums\PaymentType::Refund ? '−' : '' }}{{ $payment->currency->format($payment->amount) }}</td>

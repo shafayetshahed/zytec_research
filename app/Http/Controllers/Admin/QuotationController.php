@@ -57,6 +57,10 @@ class QuotationController extends Controller
             return back()->with('status', 'Quotation saved as a draft. The student cannot see it until you send it.');
         }
 
+        if (blank($submission->contact_email)) {
+            return back()->with('status', 'Quotation saved and issued. This client has no email address, so share the quotation PDF on WhatsApp.');
+        }
+
         $this->notifyStudent($submission);
 
         return back()->with('status', 'Quotation sent. The student has been emailed and can see it in their portal.');

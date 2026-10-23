@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderSource;
 use App\Enums\PaymentStatus;
 use App\Enums\SubmissionStatus;
 use Database\Factories\SubmissionFactory;
@@ -20,15 +21,16 @@ use Illuminate\Support\Carbon;
  * @property int $user_id
  * @property string $client_token
  * @property string $assignment_name
- * @property string $module_code
+ * @property string|null $module_code
+ * @property OrderSource $source
  * @property string|null $institution
  * @property string|null $country
  * @property string|null $subject
  * @property string|null $assessment_type
  * @property Carbon|null $deadline
  * @property string|null $description
- * @property string $contact_email
- * @property string $whatsapp_number
+ * @property string|null $contact_email
+ * @property string|null $whatsapp_number
  * @property SubmissionStatus $status
  * @property PaymentStatus $payment_status
  * @property Carbon $submitted_at
@@ -56,6 +58,7 @@ class Submission extends Model
         return [
             'status' => SubmissionStatus::class,
             'payment_status' => PaymentStatus::class,
+            'source' => OrderSource::class,
             'deadline' => 'date',
             'submitted_at' => 'datetime',
             'closed_at' => 'datetime',

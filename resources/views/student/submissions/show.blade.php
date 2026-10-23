@@ -27,7 +27,7 @@
                 <x-payment-badge :status="$submission->payment_status" class="text-sm" />
             </div>
             <div class="p-6">
-                <p class="text-ink-soft"><strong class="text-ink">{{ $submission->assignment_name }}</strong> <span class="code-tag ml-1">{{ $submission->module_code }}</span>@if ($quotation->work_due_date), delivery by <strong class="text-ink">{{ $quotation->work_due_date->format('j F Y') }}</strong>@endif</p>
+                <p class="text-ink-soft"><strong class="text-ink">{{ $submission->assignment_name }}</strong> @if ($submission->module_code)<span class="code-tag ml-1">{{ $submission->module_code }}</span>@endif @if ($quotation->work_due_date), delivery by <strong class="text-ink">{{ $quotation->work_due_date->format('j F Y') }}</strong>@endif</p>
                 <p class="mt-4 font-serif text-4xl text-royal sm:text-5xl">{{ $quotation->currency->format($quotation->total_amount) }}</p>
                 <dl class="mt-6 grid gap-px overflow-hidden rounded-md border border-line bg-line sm:grid-cols-3">
                     <div class="bg-paper p-4"><dt class="text-sm text-muted">Deposit to start</dt><dd class="mt-1 font-mono text-lg">{{ $quotation->currency->format($quotation->deposit_amount) }}</dd></div>
@@ -74,14 +74,14 @@
         <section class="card p-6 lg:col-span-2" aria-labelledby="details-heading">
             <h2 id="details-heading" class="font-serif text-xl">Details</h2>
             <dl class="mt-4 grid gap-x-6 gap-y-4 sm:grid-cols-2">
-                <div><dt class="text-sm text-muted">Module code</dt><dd class="mt-1"><span class="code-tag">{{ $submission->module_code }}</span></dd></div>
+                <div><dt class="text-sm text-muted">Module code</dt><dd class="mt-1">@if ($submission->module_code)<span class="code-tag">{{ $submission->module_code }}</span>@else Not given @endif</dd></div>
                 <div><dt class="text-sm text-muted">Submitted</dt><dd class="mt-1"><time datetime="{{ $submission->submitted_at->toIso8601String() }}">{{ $submission->submitted_at->format('j F Y, H:i') }} ({{ config('app.timezone') }})</time></dd></div>
                 <div><dt class="text-sm text-muted">Subject area</dt><dd class="mt-1">{{ $submission->subject ?? 'Not given' }}</dd></div>
                 <div><dt class="text-sm text-muted">Assessment type</dt><dd class="mt-1">{{ $submission->assessment_type ?? 'Not given' }}</dd></div>
                 <div><dt class="text-sm text-muted">University or college</dt><dd class="mt-1">{{ $submission->institution ?? 'Not given' }}</dd></div>
                 <div><dt class="text-sm text-muted">Country of study</dt><dd class="mt-1">{{ $submission->country ?? 'Not given' }}</dd></div>
                 <div><dt class="text-sm text-muted">Deadline</dt><dd class="mt-1">{{ $submission->deadline?->format('j F Y') ?? 'Not given' }}</dd></div>
-                <div><dt class="text-sm text-muted">Contact WhatsApp</dt><dd class="mt-1 font-mono">{{ $submission->whatsapp_number }}</dd></div>
+                <div><dt class="text-sm text-muted">Contact WhatsApp</dt><dd class="mt-1 font-mono">{{ $submission->whatsapp_number ?? 'Not given' }}</dd></div>
                 @if ($submission->description)
                     <div class="sm:col-span-2"><dt class="text-sm text-muted">What you asked for</dt><dd class="mt-1 whitespace-pre-line">{{ $submission->description }}</dd></div>
                 @endif
@@ -90,6 +90,9 @@
 
         <section class="card p-6" aria-labelledby="files-heading">
             <h2 id="files-heading" class="font-serif text-xl">Files</h2>
+            @if ($submission->files->isEmpty())
+                <p class="mt-4 text-sm text-muted">No files. This order was arranged with us by {{ strtolower($submission->source->label()) }}.</p>
+            @endif
             <ul class="mt-4 space-y-3">
                 @foreach ($submission->files as $file)
                     <li class="flex items-start gap-3">

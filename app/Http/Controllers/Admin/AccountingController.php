@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Enums\Currency;
+use App\Enums\OrderSource;
 use App\Enums\PaymentType;
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
@@ -32,9 +33,10 @@ class AccountingController extends Controller
 
         $outstanding = Quotation::query()
             ->whereNotNull('sent_at')
-            ->with(['submission', 'payments'])
+            ->with(['submission.student', 'payments'])
             ->when($filters['country'] ?? null, fn ($query, $country) => $query->where('country', $country))
             ->when($filters['currency'] ?? null, fn ($query, $currency) => $query->where('currency', $currency))
+            ->when($filters['source'] ?? null, fn ($query, $source) => $query->whereHas('submission', fn ($q) => $q->where('source', $source)))
             ->get()
             ->filter(fn (Quotation $quotation) => $quotation->balance() > 0)
             ->sortBy(fn (Quotation $quotation) => $quotation->work_due_date->timestamp ?? PHP_INT_MAX)
@@ -51,6 +53,7 @@ class AccountingController extends Controller
             ->whereBetween('sent_at', [$from->copy()->startOfDay(), $to->copy()->endOfDay()])
             ->when($filters['country'] ?? null, fn ($query, $country) => $query->where('country', $country))
             ->when($filters['currency'] ?? null, fn ($query, $currency) => $query->where('currency', $currency))
+            ->when($filters['source'] ?? null, fn ($query, $source) => $query->whereHas('submission', fn ($q) => $q->where('source', $source)))
             ->get()
             ->groupBy(fn (Quotation $q) => $q->currency->value)
             ->map(fn (Collection $group) => ['count' => $group->count(), 'amount' => round($group->sum(fn (Quotation $q) => (float) $q->total_amount), 2)]);
@@ -60,6 +63,7 @@ class AccountingController extends Controller
             'from' => $from,
             'to' => $to,
             'currencies' => $currencies,
+            'sources' => OrderSource::cases(),
             'countries' => SiteContent::countriesOfStudy(),
             'summary' => [
                 'received_bdt' => round($payments->where('type', PaymentType::Payment)->sum(fn (Payment $p) => (float) $p->amount_bdt), 2),
@@ -74,6 +78,8 @@ class AccountingController extends Controller
             'byYear' => $this->breakdown($payments, fn (Payment $p) => $p->paid_on->format('Y'))->sortKeysDesc(),
             'byCountry' => $this->breakdown($payments, fn (Payment $p) => $p->country ?? 'Not specified')->sortByDesc('bdt'),
             'byCurrency' => $this->breakdown($payments, fn (Payment $p) => $p->currency->value)->sortByDesc('bdt'),
+            'bySource' => $this->breakdown($payments, fn (Payment $p) => $p->source->label())->sortByDesc('bdt'),
+            'byClient' => $this->byClient($payments, $outstanding),
             'quoted' => $quoted,
             'outstanding' => $outstanding,
             'outstandingByCurrency' => $outstandingByCurrency,
@@ -88,12 +94,14 @@ class AccountingController extends Controller
 
         return response()->streamDownload(function () use ($query) {
             $out = fopen('php://output', 'w');
-            fputcsv($out, ['Date', 'Submission', 'Country', 'Type', 'Currency', 'Amount', 'Rate to BDT', 'Amount BDT', 'Rate source', 'Method', 'Reference', 'Recorded by']);
+            fputcsv($out, ['Date', 'Submission', 'Client', 'Source', 'Country', 'Type', 'Currency', 'Amount', 'Rate to BDT', 'Amount BDT', 'Rate source', 'Method', 'Reference', 'Recorded by']);
 
             foreach ($query->lazy() as $payment) {
                 fputcsv($out, array_map([$this, 'csvSafe'], [
                     $payment->paid_on->toDateString(),
                     $payment->submission_reference,
+                    $payment->submission->student->name ?? 'Deleted client',
+                    $payment->source->label(),
                     $payment->country ?? '',
                     $payment->type->label(),
                     $payment->currency->value,
@@ -130,6 +138,7 @@ class AccountingController extends Controller
             'to' => ['nullable', 'date', 'after_or_equal:from', 'required_if:period,custom'],
             'country' => ['nullable', 'string', Rule::in([...SiteContent::countriesOfStudy(), 'Not specified'])],
             'currency' => ['nullable', Rule::enum(Currency::class)],
+            'source' => ['nullable', Rule::enum(OrderSource::class)],
         ]);
 
         $filters['period'] ??= 'this_year';
@@ -156,7 +165,9 @@ class AccountingController extends Controller
 
         return Payment::query()
             ->with('recorder')
+            ->with('submission.student')
             ->whereBetween('paid_on', [$from->toDateString(), $to->toDateString()])
+            ->when($filters['source'] ?? null, fn ($query, $source) => $query->where('source', $source))
             ->when($country === 'Not specified', fn ($query) => $query->whereNull('country'))
             ->when($country !== null && $country !== 'Not specified', fn ($query) => $query->where('country', $country))
             ->when($filters['currency'] ?? null, fn ($query, $currency) => $query->where('currency', $currency));
@@ -179,5 +190,30 @@ class AccountingController extends Controller
                 ->map(fn (Collection $byCurrency) => round($byCurrency->sum(fn (Payment $p) => $p->signedAmount()), 2))
                 ->all(),
         ]);
+    }
+
+    /**
+     * Income per client in the period, with what each client still owes now.
+     *
+     * @param  Collection<int, Payment>  $payments
+     * @param  Collection<int, Quotation>  $outstanding
+     * @return Collection<int, array{id: ?int, name: string, bdt: float, native: array<array-key, float>, owed: array<array-key, float>}>
+     */
+    private function byClient(Collection $payments, Collection $outstanding): Collection
+    {
+        $paid = $payments->groupBy(fn (Payment $p) => $p->submission->user_id ?? 0);
+        $owed = $outstanding->groupBy(fn (Quotation $q) => $q->submission->user_id);
+        $names = $payments->mapWithKeys(fn (Payment $p) => [$p->submission->user_id ?? 0 => $p->submission->student->name ?? 'Deleted client'])
+            ->union($outstanding->mapWithKeys(fn (Quotation $q) => [$q->submission->user_id => $q->submission->student->name ?? 'Deleted client']));
+
+        return $names->keys()->mapWithKeys(fn (int $id) => [$id => [
+            'id' => (int) $id ?: null,
+            'name' => (string) $names[$id],
+            'bdt' => round(($paid[$id] ?? collect())->sum(fn (Payment $p) => $p->signedBdt()), 2),
+            'native' => ($paid[$id] ?? collect())->groupBy(fn (Payment $p) => $p->currency->value)
+                ->map(fn (Collection $group) => round($group->sum(fn (Payment $p) => $p->signedAmount()), 2))->all(),
+            'owed' => ($owed[$id] ?? collect())->groupBy(fn (Quotation $q) => $q->currency->value)
+                ->map(fn (Collection $group) => round($group->sum(fn (Quotation $q) => $q->balance()), 2))->all(),
+        ]])->sortByDesc('bdt');
     }
 }

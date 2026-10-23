@@ -68,10 +68,10 @@
                     @foreach ($submissions as $submission)
                         <tr>
                             <td class="font-mono whitespace-nowrap">{{ $submission->reference }}</td>
-                            <td><span class="font-medium">{{ $submission->student->name }}</span><br><span class="text-muted break-all">{{ $submission->contact_email }}</span></td>
-                            <td class="font-mono whitespace-nowrap">{{ $submission->whatsapp_number }}</td>
+                            <td><span class="font-medium">{{ $submission->student->name }}</span><br><span class="text-muted break-all">{{ $submission->contact_email ?? 'No email' }}</span>@if ($submission->source !== \App\Enums\OrderSource::Portal)<br><span class="badge mt-1 bg-paper-deep text-ink">{{ $submission->source->label() }}</span>@endif</td>
+                            <td class="font-mono whitespace-nowrap">{{ $submission->whatsapp_number ?? '—' }}</td>
                             <td class="min-w-44">{{ $submission->assignment_name }}</td>
-                            <td><span class="code-tag">{{ $submission->module_code }}</span></td>
+                            <td>@if ($submission->module_code)<span class="code-tag">{{ $submission->module_code }}</span>@else<span class="text-muted">—</span>@endif</td>
                             <td>{{ $submission->institution ?? '—' }}<br><span class="text-muted">{{ $submission->country ?? '—' }}</span></td>
                             <td class="whitespace-nowrap">{{ $submission->submitted_at->format('j M Y') }}</td>
                             <td class="whitespace-nowrap">{{ $submission->deadline?->format('j M Y') ?? '—' }}</td>

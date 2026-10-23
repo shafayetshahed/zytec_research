@@ -4,7 +4,7 @@
         <div>
             <p class="font-mono text-sm text-muted">{{ $submission->reference }}</p>
             <h1 class="mt-1 font-serif text-3xl">{{ $submission->assignment_name }}</h1>
-            <p class="mt-2"><span class="code-tag">{{ $submission->module_code }}</span> <span class="ml-2 text-sm text-muted">Submitted {{ $submission->submitted_at->format('j F Y, H:i') }}</span></p>
+            <p class="mt-2">@if ($submission->module_code)<span class="code-tag">{{ $submission->module_code }}</span> @endif<span class="badge bg-paper-deep text-ink">{{ $submission->source->label() }}</span> <span class="ml-2 text-sm text-muted">{{ $submission->source === \App\Enums\OrderSource::Portal ? 'Submitted' : 'Ordered' }} {{ $submission->submitted_at->format('j F Y, H:i') }}</span></p>
         </div>
         <x-status-badge :status="$submission->status" class="text-sm" />
     </div>
@@ -15,8 +15,8 @@
                 <h2 id="student-heading" class="font-serif text-xl">Student</h2>
                 <dl class="mt-4 grid gap-4 sm:grid-cols-3">
                     <div><dt class="text-sm text-muted">Name</dt><dd class="mt-1"><a href="{{ route('admin.students.show', $submission->student) }}">{{ $submission->student->name }}</a></dd></div>
-                    <div><dt class="text-sm text-muted">Verified email</dt><dd class="mt-1 break-all"><a href="mailto:{{ $submission->contact_email }}">{{ $submission->contact_email }}</a></dd></div>
-                    <div><dt class="text-sm text-muted">WhatsApp</dt><dd class="mt-1 font-mono"><a href="https://wa.me/{{ ltrim($submission->whatsapp_number, '+') }}" rel="noopener noreferrer" target="_blank">{{ $submission->whatsapp_number }}<span class="sr-only"> (opens WhatsApp in a new tab)</span></a></dd></div>
+                    <div><dt class="text-sm text-muted">Email</dt><dd class="mt-1 break-all">@if ($submission->contact_email)<a href="mailto:{{ $submission->contact_email }}">{{ $submission->contact_email }}</a>@else<span class="text-muted">None</span>@endif</dd></div>
+                    <div><dt class="text-sm text-muted">WhatsApp</dt><dd class="mt-1 font-mono">@if ($submission->whatsapp_number)<a href="https://wa.me/{{ ltrim($submission->whatsapp_number, '+') }}" rel="noopener noreferrer" target="_blank">{{ $submission->whatsapp_number }}<span class="sr-only"> (opens WhatsApp in a new tab)</span></a>@else<span class="font-sans text-muted">None</span>@endif</dd></div>
                 </dl>
             </section>
 
