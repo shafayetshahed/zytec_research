@@ -6,7 +6,7 @@ Run date: **23 October 2026**, macOS (Apple Silicon), PHP 8.5.12, Laravel 13.38.
 
 | Check | Result |
 | --- | --- |
-| PHPUnit feature + unit tests (SQLite, in-memory) | **255 passed**, 0 failed, 0 skipped — 1,447 assertions (re-run 23 Oct 2026 after adding confidentiality, billing/accounting, PDF documents, payment references and manual orders) |
+| PHPUnit feature + unit tests (SQLite, in-memory) | **266 passed**, 0 failed, 0 skipped — 1,497 assertions (re-run 23 Oct 2026 after all owner-requested features up to the Clients & dues page) |
 | Same suite against **MariaDB 13.0.2** | **206 passed**, 0 failed — 1,112 assertions (run before the billing feature; re-run on MariaDB before deploying). Migrations, rollback and re-migration also succeeded. Verified that the suite really used MariaDB by pointing it at a dead port (it then failed). |
 | Line coverage (`app/`, Xdebug) | **94.7 %** overall |
 | Playwright browser tests | **48 passed**, 0 failed (journeys now include sending a quotation, recording a deposit and checking accounting) |

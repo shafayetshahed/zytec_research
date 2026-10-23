@@ -143,6 +143,9 @@ Route::prefix('admin')->name('admin.')->middleware(['private', 'auth', 'active',
         Route::get('/documents/{reference}/invoice.pdf', [DocumentController::class, 'invoice'])->name('documents.invoice');
     });
 
+    Route::get('/dues', [Admin\DuesController::class, 'index'])->name('dues');
+    Route::get('/dues/export', [Admin\DuesController::class, 'export'])->name('dues.export');
+
     Route::get('/accounting', [Admin\AccountingController::class, 'index'])->name('accounting');
     Route::get('/accounting/export', [Admin\AccountingController::class, 'export'])->name('accounting.export');
 

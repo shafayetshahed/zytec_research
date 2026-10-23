@@ -50,7 +50,7 @@ test('axe: OTP page, student dashboard, submission form and admin dashboard', as
     await page.getByLabel('Email address').fill(process.env.E2E_ADMIN_EMAIL);
     await page.getByLabel('Password').fill(process.env.E2E_ADMIN_PASSWORD);
     await page.getByRole('button', { name: 'Sign in' }).click();
-    for (const path of ['/admin', '/admin/submissions', '/admin/students', '/admin/clients/create', '/admin/orders/create', '/admin/accounting', '/admin/notifications', '/admin/settings']) {
+    for (const path of ['/admin', '/admin/submissions', '/admin/students', '/admin/clients/create', '/admin/orders/create', '/admin/dues', '/admin/accounting', '/admin/notifications', '/admin/settings']) {
         await page.goto(path);
         await scan(page, path);
     }

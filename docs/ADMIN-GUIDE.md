@@ -81,6 +81,25 @@ The site produces three PDF documents with your logo, your details and the clien
 - **Business details**: add a postal address or registration details to the documents with `ZYTECS_INVOICE_ADDRESS` in `.env` (separate lines with `|`, for example `House 1, Road 2|Dhaka 1200|Bangladesh`). Change the closing line with `ZYTECS_INVOICE_NOTE`.
 - **Deleted payments**: if you delete a payment so a request is no longer paid in full, its invoice stops being downloadable until it is fully paid again. The invoice keeps the same number.
 
+## Clients & dues (`/admin/dues`)
+
+Your collections page: who owes what right now, across all of each client's orders (portal and manual), for all time.
+
+- **Summary**:
+  - total due now, in BDT at today's rates, plus each currency;
+  - total paid (all time);
+  - clients with dues out of all clients;
+  - orders, with how many are ongoing and how many completed.
+- **Tabs**: All clients, **With dues**, Paid up, No orders yet.
+- **Filters**: search by name, email, WhatsApp or order reference; filter by country; sort by biggest dues, most paid, latest payment or name.
+- **Each client row**:
+  - country, orders (and how many are ongoing), total billed, total paid (with BDT) and total due (with a BDT estimate), and the last payment date;
+  - **unpaid orders**: open them to see each order's reference, amount due and delivery date.
+- **Chasing a payment**: **Remind** opens WhatsApp with a polite, editable message listing each unpaid order, its reference and the amount due. **Call** and **Email** are there too.
+- **Export CSV** downloads the list for the current filters.
+
+The **Overview** page shows "Clients with dues"; click it to jump straight to this list.
+
 ## Accounting (`/admin/accounting`)
 
 - **Periods**: this month, last month, this year, last year, all time, or custom dates. Filter by country and currency.
