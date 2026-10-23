@@ -10,6 +10,7 @@ use App\Models\NotificationLog;
 use App\Models\Payment;
 use App\Models\Submission;
 use App\Models\User;
+use App\Services\PdfDocumentService;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
@@ -351,5 +352,45 @@ class BillingTest extends TestCase
         $this->recordPayment($admin, $submission, ['amount' => '120']);
         $cleared = new PaymentReceived($submission->fresh()->load('quotation.payments', 'student'), Payment::latest('id')->first());
         $cleared->assertSeeInHtml('Your balance is fully cleared.');
+    }
+
+    public function test_payment_reference_is_prominent_in_email_pdf_and_portal(): void
+    {
+        Mail::fake();
+        $submission = Submission::factory()->create(['assignment_name' => 'Brand plan']);
+        $this->sendQuote($this->admin(), $submission);
+        $fresh = $submission->fresh()->load('quotation.payments', 'student');
+        $reference = $submission->reference;
+
+        $mail = new QuotationIssued($fresh);
+        $mail->assertHasSubject('Your quotation '.$reference.' — Brand plan — AUD 200.00');
+        $mail->assertSeeInHtml('Your payment reference: '.$reference);
+        $mail->assertSeeInText('Write '.$reference.' in the reference or note field when you pay by bKash');
+        $mail->assertSeeInText('When you send a payment screenshot by email or WhatsApp, mention '.$reference);
+
+        $pdfHtml = app(PdfDocumentService::class)->html('documents.quotation', ['quotation' => $fresh->quotation]);
+        $this->assertStringContainsString('Payment reference', $pdfHtml);
+        $this->assertStringContainsString('payment screenshot by email or WhatsApp, mention '.$reference, strip_tags($pdfHtml));
+        $this->assertStringContainsString('white-space: nowrap;">'.$reference, $pdfHtml);
+
+        $this->actingAs($submission->student)->get(route('student.submissions.show', $reference))
+            ->assertSee('Your payment reference')
+            ->assertSee('in the reference or note field when you pay by bKash', false);
+
+        $this->actingAs(User::where('role', 'admin')->first())->get(route('admin.submissions.show', $submission))
+            ->assertSee('Students are asked to quote', false);
+    }
+
+    public function test_reference_block_is_hidden_once_paid_in_full(): void
+    {
+        Mail::fake();
+        $this->fakeRates();
+        $submission = Submission::factory()->create();
+        $admin = $this->admin();
+        $this->sendQuote($admin, $submission);
+        $this->recordPayment($admin, $submission, ['amount' => '200']);
+
+        $this->actingAs($submission->student)->get(route('student.submissions.show', $submission->reference))
+            ->assertDontSee('Your payment reference');
     }
 }

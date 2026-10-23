@@ -92,6 +92,7 @@
 
         <details class="mt-4 rounded-md border border-line" @if ($errors->hasAny(['amount', 'paid_on', 'method', 'rate_to_bdt', 'type'])) open @endif>
             <summary class="cursor-pointer px-4 py-3 font-semibold">Record a payment or refund</summary>
+            <p class="border-t border-line px-4 pt-3 text-sm text-muted">Students are asked to quote <strong class="font-mono text-ink">{{ $submission->reference }}</strong> in their bKash/bank note and with any payment screenshot.</p>
             <form method="POST" action="{{ route('admin.submissions.payments.store', $submission) }}" class="grid gap-4 border-t border-line p-4 sm:grid-cols-2" novalidate>
                 @csrf
                 <x-select-field name="type" label="Type" :options="['payment' => 'Payment received', 'refund' => 'Refund given']" value="payment" />

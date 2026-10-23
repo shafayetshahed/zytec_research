@@ -39,6 +39,15 @@ Students pay you outside the website (bank transfer, bKash, Nagad, Rocket, Wise,
    - **Payment status** updates automatically: Awaiting payment → Part paid → Deposit paid → Paid in full. When the deposit is reached, the work status moves to "In progress".
 4. **Complete the request**: a request with a quotation can only be marked **Completed** once it is **Paid in full**. Mistakes can be removed with **Delete**; deletions are recorded in the audit log.
 
+## Order and payment reference
+
+Every request has one reference, created when the student submits it (for example `ZR-2610-K7Q2MX`). Students are asked to:
+
+- write it in the reference or note field of bKash, Nagad, Rocket, bank, Wise or any other payment;
+- mention it when they send a payment screenshot by email or WhatsApp.
+
+The reference and these instructions appear in the quotation email (and its subject line), on the quotation PDF, on the student's request page while a balance is outstanding, and in receipt emails. Search for it in **Submissions** to find the request, then record the payment, putting the bKash or bank transaction ID in **Transaction reference**.
+
 ## Quotations, receipts and invoices (PDF)
 
 The site produces three PDF documents with your logo, your details and the client's name and email. It never includes the student's WhatsApp number or your exchange rates.

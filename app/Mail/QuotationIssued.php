@@ -21,7 +21,7 @@ class QuotationIssued extends Mailable
         $quotation = $this->submission->quotation;
 
         return new Envelope(
-            subject: 'Your quotation for '.str($this->submission->assignment_name)->limit(60).' — '.$quotation?->currency->format($quotation->total_amount),
+            subject: 'Your quotation '.$this->submission->reference.' — '.str($this->submission->assignment_name)->limit(50).' — '.$quotation?->currency->format($quotation->total_amount),
         );
     }
 

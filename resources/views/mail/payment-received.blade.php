@@ -14,7 +14,7 @@ We have received your payment of **{{ $payment->currency->format($payment->amoun
 @if ($quotation->balance() <= 0)
 Your balance is fully cleared. Thank you. Your receipt and final invoice are attached.
 @else
-Your receipt is attached. The remaining balance is due before your work is completed.
+Your receipt is attached. The remaining balance is due before your work is completed. Please use your payment reference **{{ $submission->reference }}** for the next payment and when sending a screenshot.
 @endif
 
 <x-mail::button :url="$portalUrl">

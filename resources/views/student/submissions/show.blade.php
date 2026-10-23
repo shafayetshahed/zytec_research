@@ -34,6 +34,17 @@
                     <div class="bg-paper p-4"><dt class="text-sm text-muted">Paid so far</dt><dd class="mt-1 font-mono text-lg text-success">{{ $quotation->currency->format($quotation->amountPaid()) }}</dd></div>
                     <div class="bg-paper p-4"><dt class="text-sm text-muted">Balance due</dt><dd class="mt-1 font-mono text-lg {{ $quotation->balance() > 0 ? 'text-danger' : 'text-success' }}">{{ $quotation->currency->format($quotation->balance()) }}</dd></div>
                 </dl>
+                @if ($quotation->balance() > 0)
+                    <div class="mt-6 rounded-md border-2 border-royal/40 bg-[#e8f0fb] p-5">
+                        <p class="text-sm font-semibold tracking-wide text-royal-dark uppercase">Your payment reference</p>
+                        <p class="mt-1 font-mono text-2xl font-semibold tracking-wide text-ink select-all sm:text-3xl">{{ $submission->reference }}</p>
+                        <ul class="mt-3 list-disc space-y-1 pl-5 text-sm text-ink-soft">
+                            @foreach (\App\Support\PaymentReference::instructions($submission->reference) as $line)
+                                <li>{!! str_replace(e($submission->reference), '<strong class="font-mono whitespace-nowrap text-ink">'.e($submission->reference).'</strong>', e($line)) !!}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
                 @if ($quotation->message)
                     <p class="mt-5 whitespace-pre-line text-ink-soft">{{ $quotation->message }}</p>
                 @endif

@@ -15,8 +15,15 @@ Thank you for your request. We have reviewed it and here is our quotation.
 @if ($quotation->work_due_date)
 **Delivery date:** {{ $quotation->work_due_date->format('j F Y') }}
 @endif
-**Reference:** {{ $submission->reference }}
 </x-mail::panel>
+
+## Your payment reference: {{ $submission->reference }}
+
+@foreach (\App\Support\PaymentReference::instructions($submission->reference) as $line)
+- {{ $line }}
+@endforeach
+
+This helps us match your payment to your order quickly.
 
 @if ($quotation->message)
 {{ \App\Support\MarkdownText::escape($quotation->message) }}
