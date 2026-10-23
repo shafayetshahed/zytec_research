@@ -13,6 +13,9 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $submission_id
+ * @property string|null $number
+ * @property string|null $invoice_number
+ * @property Carbon|null $invoiced_at
  * @property Currency $currency
  * @property string $total_amount
  * @property string $deposit_amount
@@ -39,6 +42,7 @@ class Quotation extends Model
             'deposit_amount' => 'decimal:2',
             'work_due_date' => 'date',
             'sent_at' => 'datetime',
+            'invoiced_at' => 'datetime',
         ];
     }
 

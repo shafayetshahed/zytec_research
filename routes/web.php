@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\Student;
@@ -88,6 +89,12 @@ Route::prefix('student')->name('student.')->middleware(['private', 'auth', 'acti
     Route::get('/submissions/{reference}', [Student\SubmissionController::class, 'show'])->name('submissions.show');
     Route::get('/submissions/{reference}/files/{file}', [Student\SubmissionController::class, 'download'])
         ->whereNumber('file')->middleware('throttle:downloads')->name('submissions.files.download');
+
+    Route::middleware('throttle:downloads')->group(function () {
+        Route::get('/submissions/{reference}/quotation.pdf', [DocumentController::class, 'quotation'])->name('documents.quotation');
+        Route::get('/submissions/{reference}/receipts/{payment}.pdf', [DocumentController::class, 'receipt'])->whereNumber('payment')->name('documents.receipt');
+        Route::get('/submissions/{reference}/invoice.pdf', [DocumentController::class, 'invoice'])->name('documents.invoice');
+    });
 });
 
 /*
@@ -121,6 +128,12 @@ Route::prefix('admin')->name('admin.')->middleware(['private', 'auth', 'active',
     Route::get('/enquiries', [Admin\EnquiryController::class, 'index'])->name('enquiries.index');
     Route::get('/enquiries/{enquiry}', [Admin\EnquiryController::class, 'show'])->name('enquiries.show');
     Route::post('/enquiries/{enquiry}/handled', [Admin\EnquiryController::class, 'markHandled'])->name('enquiries.handled');
+
+    Route::middleware('throttle:downloads')->group(function () {
+        Route::get('/documents/{reference}/quotation.pdf', [DocumentController::class, 'quotation'])->name('documents.quotation');
+        Route::get('/documents/{reference}/receipts/{payment}.pdf', [DocumentController::class, 'receipt'])->whereNumber('payment')->name('documents.receipt');
+        Route::get('/documents/{reference}/invoice.pdf', [DocumentController::class, 'invoice'])->name('documents.invoice');
+    });
 
     Route::get('/accounting', [Admin\AccountingController::class, 'index'])->name('accounting');
     Route::get('/accounting/export', [Admin\AccountingController::class, 'export'])->name('accounting.export');

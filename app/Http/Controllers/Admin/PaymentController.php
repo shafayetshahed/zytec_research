@@ -12,6 +12,7 @@ use App\Models\Payment;
 use App\Models\Submission;
 use App\Services\AuditLogger;
 use App\Services\BillingService;
+use App\Services\DocumentNumberService;
 use App\Services\ExchangeRateService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Carbon;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
-    public function store(StorePaymentRequest $request, Submission $submission, ExchangeRateService $rates, BillingService $billing, AuditLogger $audit): RedirectResponse
+    public function store(StorePaymentRequest $request, Submission $submission, ExchangeRateService $rates, BillingService $billing, DocumentNumberService $numbers, AuditLogger $audit): RedirectResponse
     {
         $quotation = $submission->quotation;
 
@@ -42,7 +43,7 @@ class PaymentController extends Controller
             return back()->withInput()->withErrors(['rate_to_bdt' => 'The exchange rate could not be fetched. Enter the rate you received (BDT per 1 '.$quotation->currency->value.').']);
         }
 
-        $payment = DB::transaction(function () use ($request, $submission, $quotation, $type, $amount, $paidOn, $rate, $manualRate, $billing) {
+        $payment = DB::transaction(function () use ($request, $submission, $quotation, $type, $amount, $paidOn, $rate, $manualRate, $billing, $numbers) {
             $payment = new Payment;
             $payment->submission_id = $submission->id;
             $payment->quotation_id = $quotation->id;
@@ -59,6 +60,7 @@ class PaymentController extends Controller
             $payment->rate_source = $manualRate !== null ? 'manual' : 'auto';
             $payment->note = $request->validated('note');
             $payment->recorded_by = $request->user()->id;
+            $payment->receipt_number = $type === PaymentType::Payment ? $numbers->next(DocumentNumberService::RECEIPT) : null;
             $payment->save();
 
             $billing->refresh($submission, $request->user()->id);

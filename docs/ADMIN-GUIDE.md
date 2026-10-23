@@ -39,6 +39,20 @@ Students pay you outside the website (bank transfer, bKash, Nagad, Rocket, Wise,
    - **Payment status** updates automatically: Awaiting payment → Part paid → Deposit paid → Paid in full. When the deposit is reached, the work status moves to "In progress".
 4. **Complete the request**: a request with a quotation can only be marked **Completed** once it is **Paid in full**. Mistakes can be removed with **Delete**; deletions are recorded in the audit log.
 
+## Quotations, receipts and invoices (PDF)
+
+The site produces three PDF documents with your logo, your details and the client's name and email. It never includes the student's WhatsApp number or your exchange rates.
+
+| Document | Number | Issued when | Where to find it |
+| --- | --- | --- | --- |
+| Quotation | `QUO-2026-0001` | You first send a quotation (re-sending keeps the number) | Attached to the quotation email; **Quotation** button on the submission; **Quotation PDF** on the student's page |
+| Payment receipt | `RCP-2026-0001` | Each payment you record, including advances and deposits (not refunds) | Attached to the receipt email; **Receipt** link beside each payment, for you and the student |
+| Final invoice, marked PAID | `INV-2026-0001` | The first time the balance is fully paid | Attached to the final receipt email; **Invoice** button on the submission; **Final invoice (paid)** for the student |
+
+- **Numbering**: numbers run in sequence per year and are never reused.
+- **Business details**: add a postal address or registration details to the documents with `ZYTECS_INVOICE_ADDRESS` in `.env` (separate lines with `|`, for example `House 1, Road 2|Dhaka 1200|Bangladesh`). Change the closing line with `ZYTECS_INVOICE_NOTE`.
+- **Deleted payments**: if you delete a payment so a request is no longer paid in full, its invoice stops being downloadable until it is fully paid again. The invoice keeps the same number.
+
 ## Accounting (`/admin/accounting`)
 
 - **Periods**: this month, last month, this year, last year, all time, or custom dates. Filter by country and currency.

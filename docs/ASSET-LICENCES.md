@@ -35,6 +35,13 @@ Attribution is not required, but crediting photographers is good practice; this 
 
 Lucide icons (SVG files copied from `lucide-static` 1.61.0 into `resources/icons/`). Licence: ISC — https://lucide.dev/license. The licence header is preserved in each source SVG.
 
+## Libraries
+
+| Library | Use | Licence |
+| --- | --- | --- |
+| Dompdf 3.1 | PDF quotations, receipts and invoices | LGPL-2.1 (used unmodified as a Composer dependency) |
+| DejaVu Sans (bundled with Dompdf) | Font in PDF documents | Bitstream Vera / DejaVu licence (free) |
+
 ## Fonts
 
 Self-hosted at build time by `laravel-vite-plugin` (downloaded from Bunny Fonts, served from this site — no third-party font requests from visitors):

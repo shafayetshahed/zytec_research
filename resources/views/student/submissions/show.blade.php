@@ -37,13 +37,19 @@
                 @if ($quotation->message)
                     <p class="mt-5 whitespace-pre-line text-ink-soft">{{ $quotation->message }}</p>
                 @endif
+                <div class="mt-5 flex flex-wrap gap-2">
+                    <a href="{{ route('student.documents.quotation', $submission->reference) }}" class="btn btn-outline btn-sm"><x-icon name="download" class="size-4" />Quotation PDF</a>
+                    @if ($submission->payment_status === \App\Enums\PaymentStatus::PaidInFull && $quotation->invoice_number)
+                        <a href="{{ route('student.documents.invoice', $submission->reference) }}" class="btn btn-primary btn-sm"><x-icon name="download" class="size-4" />Final invoice (paid)</a>
+                    @endif
+                </div>
                 <p class="mt-5 text-sm text-muted">We will confirm with you on WhatsApp before starting. Work begins once the deposit is received; the balance is due before completion.</p>
                 @if ($quotation->payments->isNotEmpty())
                     <h3 class="mt-6 font-sans text-sm font-semibold">Payments received</h3>
                     <ul class="mt-2 divide-y divide-line-soft text-sm">
                         @foreach ($quotation->payments as $payment)
                             <li class="flex flex-wrap justify-between gap-2 py-2">
-                                <span>{{ $payment->paid_on->format('j M Y') }} · {{ $payment->method->label() }}</span>
+                                <span>{{ $payment->paid_on->format('j M Y') }} · {{ $payment->method->label() }}@if ($payment->receipt_number) · <a href="{{ route('student.documents.receipt', [$submission->reference, $payment->id]) }}">Receipt {{ $payment->receipt_number }}</a>@endif</span>
                                 <span class="font-mono {{ $payment->type === \App\Enums\PaymentType::Refund ? 'text-danger' : '' }}">{{ $payment->type === \App\Enums\PaymentType::Refund ? 'Refund −' : '' }}{{ $payment->currency->format($payment->amount) }}</span>
                             </li>
                         @endforeach

@@ -14,6 +14,8 @@ use App\Models\SubmissionStatusChange;
  */
 class BillingService
 {
+    public function __construct(private DocumentNumberService $numbers) {}
+
     /** Work statuses that move to "In progress" once the deposit is paid. */
     private const PRE_WORK = [
         SubmissionStatus::New,
@@ -41,6 +43,13 @@ class BillingService
         }
 
         $submission->payment_status = $status;
+
+        // The final invoice is issued once, the first time the balance is cleared.
+        if ($status === PaymentStatus::PaidInFull && $quotation->invoice_number === null) {
+            $quotation->invoice_number = $this->numbers->next(DocumentNumberService::INVOICE);
+            $quotation->invoiced_at = now();
+            $quotation->save();
+        }
 
         if (in_array($status, [PaymentStatus::DepositPaid, PaymentStatus::PaidInFull], true)
             && in_array($submission->status, self::PRE_WORK, true)) {

@@ -12,12 +12,13 @@ use App\Models\Quotation;
 use App\Models\Submission;
 use App\Services\AuditLogger;
 use App\Services\BillingService;
+use App\Services\DocumentNumberService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
 class QuotationController extends Controller
 {
-    public function save(SaveQuotationRequest $request, Submission $submission, BillingService $billing, AuditLogger $audit): RedirectResponse
+    public function save(SaveQuotationRequest $request, Submission $submission, BillingService $billing, DocumentNumberService $numbers, AuditLogger $audit): RedirectResponse
     {
         $send = $request->validated('action') === 'send';
         $quotation = $submission->quotation ?? new Quotation;
@@ -26,13 +27,14 @@ class QuotationController extends Controller
             return back()->withInput()->withErrors(['currency' => 'The currency cannot be changed after payments have been recorded.']);
         }
 
-        DB::transaction(function () use ($request, $submission, $quotation, $send, $billing) {
+        DB::transaction(function () use ($request, $submission, $quotation, $send, $billing, $numbers) {
             $quotation->fill($request->safe()->except('action'));
             $quotation->submission_id = $submission->id;
             $quotation->created_by ??= $request->user()->id;
 
             if ($send) {
                 $quotation->sent_at = now();
+                $quotation->number ??= $numbers->next(DocumentNumberService::QUOTATION);
             }
 
             $quotation->save();

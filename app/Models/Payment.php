@@ -16,6 +16,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property int|null $submission_id
  * @property int|null $quotation_id
+ * @property string|null $receipt_number
  * @property string $submission_reference
  * @property string|null $country
  * @property PaymentType $type

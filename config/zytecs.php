@@ -24,6 +24,9 @@ return [
         // Set to true once the privacy policy and terms have had legal review.
         'policies_reviewed' => (bool) env('ZYTECS_POLICIES_REVIEWED', false),
         'policies_updated' => '23 October 2026',
+        // Shown on quotations, receipts and invoices. Separate lines with "|".
+        'invoice_address' => env('ZYTECS_INVOICE_ADDRESS', ''),
+        'invoice_note' => env('ZYTECS_INVOICE_NOTE', 'Thank you for choosing Zytecs Research.'),
     ],
 
     /*

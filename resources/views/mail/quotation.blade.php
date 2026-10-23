@@ -22,7 +22,7 @@ Thank you for your request. We have reviewed it and here is our quotation.
 {{ \App\Support\MarkdownText::escape($quotation->message) }}
 @endif
 
-We will confirm with you on WhatsApp before we start. Work begins once the deposit has been received, and the balance is due before completion.
+The quotation is attached as a PDF. We will confirm with you on WhatsApp before we start. Work begins once the deposit has been received, and the balance is due before completion.
 
 <x-mail::button :url="$portalUrl">
 View your quotation

@@ -12,9 +12,9 @@ We have received your payment of **{{ $payment->currency->format($payment->amoun
 </x-mail::panel>
 
 @if ($quotation->balance() <= 0)
-Your balance is fully cleared. Thank you.
+Your balance is fully cleared. Thank you. Your receipt and final invoice are attached.
 @else
-The remaining balance is due before your work is completed.
+Your receipt is attached. The remaining balance is due before your work is completed.
 @endif
 
 <x-mail::button :url="$portalUrl">

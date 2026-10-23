@@ -15,6 +15,14 @@
             <div class="bg-paper p-4"><dt class="text-xs text-muted uppercase">Paid</dt><dd class="mt-1 font-mono text-lg text-success">{{ $quotation->currency->format($quotation->amountPaid()) }}</dd></div>
             <div class="bg-paper p-4"><dt class="text-xs text-muted uppercase">Balance</dt><dd class="mt-1 font-mono text-lg {{ $quotation->balance() > 0 ? 'text-danger' : 'text-success' }}">{{ $quotation->currency->format($quotation->balance()) }}</dd></div>
         </dl>
+        @if ($sent)
+            <div class="mt-4 flex flex-wrap gap-2">
+                <a href="{{ route('admin.documents.quotation', $submission->reference) }}" class="btn btn-outline btn-sm"><x-icon name="file-text" class="size-4" />Quotation {{ $quotation->number }}</a>
+                @if ($submission->payment_status === \App\Enums\PaymentStatus::PaidInFull && $quotation->invoice_number)
+                    <a href="{{ route('admin.documents.invoice', $submission->reference) }}" class="btn btn-outline btn-sm"><x-icon name="badge-check" class="size-4" />Invoice {{ $quotation->invoice_number }}</a>
+                @endif
+            </div>
+        @endif
         <p class="mt-2 text-sm text-muted">
             @if ($sent)
                 Sent to the student {{ $quotation->sent_at->format('j M Y H:i') }}.
@@ -65,8 +73,11 @@
                                 <td class="font-mono text-xs">{{ rtrim(rtrim($payment->rate_to_bdt, '0'), '.') }} <span class="text-muted">({{ $payment->rate_source }})</span></td>
                                 <td class="font-mono whitespace-nowrap">BDT {{ number_format((float) $payment->amount_bdt, 2) }}</td>
                                 <td>{{ $payment->method->label() }}@if ($payment->reference)<br><span class="text-xs text-muted">{{ $payment->reference }}</span>@endif</td>
-                                <td>
-                                    <form method="POST" action="{{ route('admin.submissions.payments.destroy', [$submission, $payment]) }}" data-confirm="Delete this payment record?">
+                                <td class="whitespace-nowrap">
+                                    @if ($payment->receipt_number)
+                                        <a href="{{ route('admin.documents.receipt', [$submission->reference, $payment->id]) }}" class="text-sm">Receipt<span class="sr-only"> {{ $payment->receipt_number }}</span></a>
+                                    @endif
+                                    <form method="POST" action="{{ route('admin.submissions.payments.destroy', [$submission, $payment]) }}" data-confirm="Delete this payment record?" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-sm text-danger underline underline-offset-4">Delete<span class="sr-only"> payment of {{ $payment->amount }}</span></button>

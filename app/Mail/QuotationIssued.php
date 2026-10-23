@@ -3,8 +3,10 @@
 namespace App\Mail;
 
 use App\Models\Submission;
+use App\Services\PdfDocumentService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 
@@ -32,5 +34,21 @@ class QuotationIssued extends Mailable
                 'portalUrl' => route('student.submissions.show', $this->submission->reference),
             ],
         );
+    }
+
+    /**
+     * @return array<int, Attachment>
+     */
+    public function attachments(): array
+    {
+        $quotation = $this->submission->quotation;
+
+        if ($quotation?->number === null) {
+            return [];
+        }
+
+        return [
+            Attachment::fromData(fn () => app(PdfDocumentService::class)->quotation($quotation), $quotation->number.'.pdf')->withMime('application/pdf'),
+        ];
     }
 }

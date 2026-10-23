@@ -46,6 +46,7 @@ This document lists the controls in place, the results of the independent review
 - Money is stored as fixed-point decimals. Each payment keeps its own exchange rate and BDT value, so reports never change after the fact.
 - Payment records survive deletion of the request, keeping only the reference and country, for accounting purposes. The privacy policy says so.
 - CSV export neutralises spreadsheet formulas in free-text fields.
+- PDF documents are generated with Dompdf with remote resources, PHP and JavaScript disabled and file access limited to `public/images`. Students can download only their own sent quotations, receipts and paid invoices (404 otherwise); downloads are audit-logged.
 - Exchange-rate lookups send only the currency code and date to the rate service, with a 5-second timeout and caching; no personal data leaves the server.
 
 ### Logging and audit
